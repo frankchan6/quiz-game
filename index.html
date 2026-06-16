@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>🧠 专属答题挑战</title>
+<title>🍅 专属答题挑战</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
@@ -36,12 +36,34 @@
     max-width: 420px;
     padding: 20px;
     position: relative;
+    z-index: 1;
+  }
+
+  /* ====== 浮动番茄 ====== */
+  .tomato-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .tomato-bg .t {
+    position: absolute;
+    font-size: 1.4em;
+    opacity: 0.12;
+    animation: tomatoFloat linear infinite;
+  }
+  @keyframes tomatoFloat {
+    0%   { transform: translateY(100vh) rotate(0deg); }
+    100% { transform: translateY(-10vh) rotate(360deg); }
   }
 
   /* ====== 密码页 ====== */
   .password-screen {
     text-align: center;
     animation: fadeUp 0.6s ease;
+    position: relative;
+    z-index: 1;
   }
   .password-screen h1 {
     font-size: 2em;
@@ -387,11 +409,14 @@
 </head>
 <body>
 
+<!-- 浮动番茄背景 -->
+<div class="tomato-bg" id="tomatoBg"></div>
+
 <!-- ====== 密码页 ====== -->
 <div class="container">
   <div class="password-screen" id="passwordScreen">
-    <h1>🔐 专属密码</h1>
-    <p class="hint">输入我们在一起的 <span class="heart">纪念日</span> 吧</p>
+    <h1>🍅 专属密码</h1>
+    <p class="hint">小番，输入我们在一起的 <span class="heart">纪念日</span> 吧</p>
     <div class="pwd-input-group">
       <input class="pwd-digit" type="tel" maxlength="1" inputmode="numeric" autofocus>
       <input class="pwd-digit" type="tel" maxlength="1" inputmode="numeric">
@@ -401,14 +426,14 @@
       <input class="pwd-digit" type="tel" maxlength="1" inputmode="numeric">
     </div>
     <div class="pwd-error" id="pwdError"></div>
-    <button class="pwd-btn" onclick="checkPassword()">解锁 💕</button>
+    <button class="pwd-btn" onclick="checkPassword()">解锁 🍅</button>
   </div>
 
   <!-- ====== 开始页 ====== -->
   <div class="start-screen" id="startScreen" style="display:none">
-    <h1>🧠 专属答题</h1>
-    <p class="subtitle">关于我们的小测试，准备好了吗？</p>
-    <button class="start-btn" onclick="startQuiz()">开始答题 🚀</button>
+    <h1>🍅 专属答题</h1>
+    <p class="subtitle">小番专属测试，准备好了吗？</p>
+    <button class="start-btn" onclick="startQuiz()">开始答题 🍅</button>
   </div>
 
   <!-- 进度条 -->
@@ -436,9 +461,9 @@
 <!-- ====== 表白页 ====== -->
 <div class="confession-screen" id="confessionScreen">
   <div class="floating-hearts" id="floatingHearts"></div>
-  <div class="big-heart">❤️</div>
-  <div class="confession-text">晓帆，我喜欢你</div>
-  <div class="confession-sub">从今天起，我们一起走下去吧 💕</div>
+  <div class="big-heart">🍅</div>
+  <div class="confession-text">小番，我喜欢你</div>
+  <div class="confession-sub">从今天起，我们一起走下去吧 🍅💕</div>
   <div class="confession-date" id="confessionDate"></div>
 </div>
 
@@ -475,7 +500,7 @@ function checkPassword() {
     document.getElementById("startScreen").style.display = "block";
   } else {
     const err = document.getElementById("pwdError");
-    err.textContent = "密码不对哦，再想想 🤔";
+    err.textContent = "密码不对哦，小番再想想 🍅";
     // 抖动输入框
     digits.forEach(d => { d.style.animation = "shake 0.4s ease"; setTimeout(() => d.style.animation = "", 400); });
   }
@@ -596,7 +621,7 @@ function selectAnswer(idx) {
         hint = document.createElement("div");
         hint.className = "no-hint";
         hint.style.cssText = "text-align:center;margin-top:20px;color:var(--pink);font-size:1.1em;animation:fadeUp 0.3s ease";
-        hint.textContent = "不可以哦～再选一次 💕";
+        hint.textContent = "🍅 小番不许选这个！再选一次～";
         container.appendChild(hint);
       }
     }
@@ -636,12 +661,12 @@ function showConfession() {
   screen.classList.add("active");
 
   // 显示日期
-  document.getElementById("confessionDate").textContent = "2026.05.31 — 我们的故事从这里开始 ✨";
+  document.getElementById("confessionDate").textContent = "🍅 2026.05.31 — 我们的故事从这里开始 🍅";
 
-  // 浮动爱心
+  // 浮动爱心+番茄
   const container = document.getElementById("floatingHearts");
-  const hearts = ["💕", "💗", "💖", "💘", "❤️", "🩷", "💝"];
-  for (let i = 0; i < 25; i++) {
+  const hearts = ["💕", "💗", "💖", "💘", "❤️", "🩷", "💝", "🍅", "🍅", "🍅"];
+  for (let i = 0; i < 30; i++) {
     const h = document.createElement("div");
     h.className = "floating-heart";
     h.textContent = hearts[Math.floor(Math.random() * hearts.length)];
@@ -693,7 +718,7 @@ function getComment(s) {
 function launchConfetti() {
   const container = document.getElementById("confettiContainer");
   container.innerHTML = "";
-  const colors = ["#6c5ce7", "#fd79a8", "#00b894", "#fdcb6e", "#e17055", "#74b9ff", "#ff6b81"];
+  const colors = ["#e74c3c", "#27ae60", "#fd79a8", "#fdcb6e", "#e17055", "#ff6b6b", "#ff6b81", "#6c5ce7"];
 
   for (let i = 0; i < 100; i++) {
     const c = document.createElement("div");
@@ -784,6 +809,22 @@ function restartQuiz() {
   document.getElementById("startScreen").style.display = "block";
   document.getElementById("questionContainer").innerHTML = "";
 }
+
+// ========== 浮动番茄背景 ==========
+(function initTomatoBg() {
+  const bg = document.getElementById("tomatoBg");
+  const tomatoes = ["🍅"];
+  for (let i = 0; i < 12; i++) {
+    const t = document.createElement("span");
+    t.className = "t";
+    t.textContent = tomatoes[0];
+    t.style.left = Math.random() * 100 + "vw";
+    t.style.fontSize = (Math.random() * 1 + 1) + "em";
+    t.style.animationDuration = (Math.random() * 10 + 12) + "s";
+    t.style.animationDelay = (Math.random() * 10) + "s";
+    bg.appendChild(t);
+  }
+})();
 </script>
 </body>
 </html>
