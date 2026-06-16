@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🧠 趣味答题挑战</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --bg: #0f0f1a;
+    --card-bg: #1a1a2e;
+    --accent: #6c5ce7;
+    --accent-light: #a29bfe;
+    --correct: #00b894;
+    --wrong: #e17055;
+    --text: #f5f5f5;
+    --text-dim: #999;
+    --radius: 16px;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100dvh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 420px;
+    padding: 20px;
+    position: relative;
+  }
+
+  /* ====== 开始页 ====== */
+  .start-screen {
+    text-align: center;
+    animation: fadeUp 0.6s ease;
+  }
+  .start-screen h1 {
+    font-size: 2.2em;
+    margin-bottom: 8px;
+  }
+  .start-screen .subtitle {
+    color: var(--text-dim);
+    font-size: 1em;
+    margin-bottom: 40px;
+  }
+  .start-btn {
+    background: linear-gradient(135deg, var(--accent), #8e7cf8);
+    color: #fff;
+    border: none;
+    padding: 16px 48px;
+    font-size: 1.2em;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 20px rgba(108, 92, 231, 0.4);
+  }
+  .start-btn:active { transform: scale(0.95); }
+
+  /* ====== 进度条 ====== */
+  .progress-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 3px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-light));
+    border-radius: 3px;
+    transition: width 0.4s ease;
+  }
+
+  /* ====== 题目卡片 ====== */
+  .question-card {
+    display: none;
+    animation: fadeUp 0.45s ease;
+  }
+  .question-card.active { display: block; }
+  .question-num {
+    font-size: 0.85em;
+    color: var(--accent-light);
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+  .question-text {
+    font-size: 1.35em;
+    font-weight: 700;
+    line-height: 1.5;
+    margin-bottom: 28px;
+  }
+
+  /* ====== 选项 ====== */
+  .options { display: flex; flex-direction: column; gap: 14px; }
+  .option {
+    background: var(--card-bg);
+    border: 2px solid transparent;
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    font-size: 1.05em;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+  }
+  .option:active { transform: scale(0.97); }
+  .option.disabled { pointer-events: none; opacity: 0.6; }
+  .option.correct {
+    border-color: var(--correct);
+    background: rgba(0, 184, 148, 0.15);
+    animation: pulse 0.4s ease;
+  }
+  .option.wrong {
+    border-color: var(--wrong);
+    background: rgba(225, 112, 85, 0.15);
+    animation: shake 0.4s ease;
+  }
+  .option .label {
+    display: inline-block;
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+    text-align: center;
+    background: rgba(255,255,255,0.08);
+    border-radius: 8px;
+    margin-right: 12px;
+    font-weight: 600;
+    font-size: 0.9em;
+    color: var(--accent-light);
+  }
+
+  /* ====== 结果页 ====== */
+  .result-screen {
+    display: none;
+    text-align: center;
+    animation: fadeUp 0.6s ease;
+  }
+  .result-screen.active { display: block; }
+  .result-emoji { font-size: 4em; margin-bottom: 16px; }
+  .result-score {
+    font-size: 3em;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent-light), #fd79a8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+  }
+  .result-comment {
+    font-size: 1.15em;
+    color: var(--text-dim);
+    margin-bottom: 32px;
+    min-height: 2em;
+  }
+
+  .action-btns { display: flex; flex-direction: column; gap: 14px; }
+  .action-btn {
+    background: var(--card-bg);
+    border: 2px solid rgba(255,255,255,0.1);
+    border-radius: var(--radius);
+    padding: 14px;
+    font-size: 1.05em;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .action-btn:active { transform: scale(0.97); }
+  .action-btn.primary {
+    background: linear-gradient(135deg, var(--accent), #8e7cf8);
+    border-color: transparent;
+    box-shadow: 0 4px 16px rgba(108, 92, 231, 0.3);
+  }
+
+  /* ====== 卡片弹窗 ====== */
+  .card-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 20px;
+    backdrop-filter: blur(8px);
+  }
+  .card-overlay.active { display: flex; }
+  .card-overlay canvas {
+    max-width: 100%;
+    border-radius: var(--radius);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  }
+  .card-overlay .close-btn {
+    margin-top: 20px;
+    background: rgba(255,255,255,0.15);
+    border: none;
+    color: #fff;
+    padding: 10px 28px;
+    border-radius: 50px;
+    font-size: 1em;
+    cursor: pointer;
+  }
+  .save-hint {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.85em;
+    margin-top: 10px;
+  }
+
+  /* ====== 纸屑 ====== */
+  .confetti-container {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 50;
+    overflow: hidden;
+  }
+  .confetti {
+    position: absolute;
+    top: -10px;
+    width: 10px;
+    height: 10px;
+    opacity: 0;
+  }
+
+  /* ====== 动画 ====== */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.03); }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%      { transform: translateX(-8px); }
+    40%      { transform: translateX(8px); }
+    60%      { transform: translateX(-4px); }
+    80%      { transform: translateX(4px); }
+  }
+  @keyframes confettiFall {
+    0%   { opacity: 1; transform: translateY(0) rotate(0deg); }
+    100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- 开始页 -->
+  <div class="start-screen" id="startScreen">
+    <h1>🧠 趣味答题</h1>
+    <p class="subtitle">5道题测测你的知识储备</p>
+    <button class="start-btn" onclick="startQuiz()">开始挑战 🚀</button>
+  </div>
+
+  <!-- 进度条 -->
+  <div class="progress-bar" id="progressBar" style="display:none">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+  <!-- 题目容器 -->
+  <div id="questionContainer"></div>
+
+  <!-- 结果页 -->
+  <div class="result-screen" id="resultScreen">
+    <div class="result-emoji" id="resultEmoji"></div>
+    <div class="result-score" id="resultScore"></div>
+    <div class="result-comment" id="resultComment"></div>
+    <div class="action-btns">
+      <button class="action-btn primary" onclick="showCard()">🎴 生成分享卡片</button>
+      <button class="action-btn" onclick="restartQuiz()">🔄 再来一次</button>
+    </div>
+  </div>
+</div>
+
+<!-- 纸屑 -->
+<div class="confetti-container" id="confettiContainer"></div>
+
+<!-- 卡片弹窗 -->
+<div class="card-overlay" id="cardOverlay">
+  <canvas id="cardCanvas" width="750" height="1000"></canvas>
+  <p class="save-hint">💡 长按图片或点击下方按钮保存</p>
+  <button class="close-btn" onclick="closeCard()">关闭</button>
+  <button class="action-btn primary" style="margin-top:12px;max-width:200px" onclick="downloadCard()">💾 保存图片</button>
+</div>
+
+<script>
+// ========== 题库 ==========
+const questions = [
+  {
+    q: "世界上最大的海洋是？",
+    options: ["大西洋", "太平洋", "印度洋", "北冰洋"],
+    answer: 1
+  },
+  {
+    q: "Python 编程语言的创始人是谁？",
+    options: ["James Gosling", "Guido van Rossum", "Brendan Eich", "Dennis Ritchie"],
+    answer: 1
+  },
+  {
+    q: "光年是什么单位？",
+    options: ["时间单位", "速度单位", "距离单位", "亮度单位"],
+    answer: 2
+  },
+  {
+    q: "以下哪个国家的国旗不是矩形？",
+    options: ["瑞士", "日本", "孟加拉国", "希腊"],
+    answer: 0
+  },
+  {
+    q: "人体最大的器官是？",
+    options: ["肝脏", "大脑", "皮肤", "肺"],
+    answer: 2
+  }
+];
+
+const LABELS = ["A", "B", "C", "D"];
+
+const COMMENTS = [
+  { min: 0, max: 0, emoji: "😅", text: "0分...你确定你不是来捣乱的？" },
+  { min: 1, max: 1, emoji: "🤔", text: "1分，看来你需要多读点书哦" },
+  { min: 2, max: 2, emoji: "😊", text: "2分，还有很大进步空间！" },
+  { min: 3, max: 3, emoji: "😎", text: "3分，还不错，有两把刷子！" },
+  { min: 4, max: 4, emoji: "🔥", text: "4分，很强！差一点就满分了！" },
+  { min: 5, max: 5, emoji: "🏆", text: "全对！你是不是偷看答案了？😏" }
+];
+
+let currentQ = 0;
+let score = 0;
+let answered = false;
+let results = []; // 记录每题结果: true=对, false=错
+
+// ========== 答题逻辑 ==========
+function startQuiz() {
+  currentQ = 0;
+  score = 0;
+  results = [];
+  document.getElementById("startScreen").style.display = "none";
+  document.getElementById("progressBar").style.display = "block";
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = questions[currentQ];
+  document.getElementById("progressFill").style.width = ((currentQ / questions.length) * 100) + "%";
+  answered = false;
+
+  const container = document.getElementById("questionContainer");
+  container.innerHTML = `
+    <div class="question-card active">
+      <div class="question-num">第 ${currentQ + 1} / ${questions.length} 题</div>
+      <div class="question-text">${q.q}</div>
+      <div class="options">
+        ${q.options.map((opt, i) => `
+          <button class="option" onclick="selectAnswer(${i})">
+            <span class="label">${LABELS[i]}</span>${opt}
+          </button>
+        `).join("")}
+      </div>
+    </div>
+  `;
+}
+
+function selectAnswer(idx) {
+  if (answered) return;
+  answered = true;
+
+  const q = questions[currentQ];
+  const options = document.querySelectorAll(".option");
+  const correct = q.answer;
+
+  options.forEach((opt, i) => {
+    opt.classList.add("disabled");
+    if (i === correct) opt.classList.add("correct");
+    if (i === idx && i !== correct) opt.classList.add("wrong");
+  });
+
+  const isCorrect = idx === correct;
+  if (isCorrect) score++;
+  results.push(isCorrect);
+
+  setTimeout(() => {
+    currentQ++;
+    if (currentQ < questions.length) {
+      renderQuestion();
+    } else {
+      showResult();
+    }
+  }, 800);
+}
+
+// ========== 结果展示 ==========
+function showResult() {
+  document.getElementById("progressFill").style.width = "100%";
+  document.getElementById("questionContainer").innerHTML = "";
+  document.getElementById("progressBar").style.display = "none";
+
+  const comment = COMMENTS.find(c => score >= c.min && score <= c.max);
+  const screen = document.getElementById("resultScreen");
+  screen.classList.add("active");
+
+  document.getElementById("resultEmoji").textContent = comment.emoji;
+  document.getElementById("resultScore").textContent = `${score} / ${questions.length}`;
+
+  // 打字机效果
+  const commentEl = document.getElementById("resultComment");
+  commentEl.textContent = "";
+  let i = 0;
+  const text = comment.text;
+  const typeInterval = setInterval(() => {
+    commentEl.textContent += text[i];
+    i++;
+    if (i >= text.length) clearInterval(typeInterval);
+  }, 50);
+
+  // 庆祝动画
+  if (score >= 3) launchConfetti();
+}
+
+// ========== 纸屑动画 ==========
+function launchConfetti() {
+  const container = document.getElementById("confettiContainer");
+  container.innerHTML = "";
+  const colors = ["#6c5ce7", "#fd79a8", "#00b894", "#fdcb6e", "#e17055", "#74b9ff"];
+
+  for (let i = 0; i < 80; i++) {
+    const c = document.createElement("div");
+    c.className = "confetti";
+    c.style.left = Math.random() * 100 + "vw";
+    c.style.background = colors[Math.floor(Math.random() * colors.length)];
+    c.style.width = (Math.random() * 8 + 6) + "px";
+    c.style.height = (Math.random() * 8 + 6) + "px";
+    c.style.borderRadius = Math.random() > 0.5 ? "50%" : "2px";
+    c.style.animation = `confettiFall ${Math.random() * 2 + 1.5}s ease-out ${Math.random() * 0.8}s forwards`;
+    container.appendChild(c);
+  }
+
+  setTimeout(() => container.innerHTML = "", 4000);
+}
+
+// ========== 分享卡片 ==========
+function showCard() {
+  const canvas = document.getElementById("cardCanvas");
+  const ctx = canvas.getContext("2d");
+  const W = canvas.width, H = canvas.height;
+  const comment = COMMENTS.find(c => score >= c.min && score <= c.max);
+
+  // 背景渐变
+  const grad = ctx.createLinearGradient(0, 0, W, H);
+  grad.addColorStop(0, "#1a1a2e");
+  grad.addColorStop(1, "#16213e");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  // 装饰圆
+  ctx.globalAlpha = 0.08;
+  ctx.fillStyle = "#6c5ce7";
+  ctx.beginPath(); ctx.arc(600, 150, 200, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = "#fd79a8";
+  ctx.beginPath(); ctx.arc(150, 800, 160, 0, Math.PI * 2); ctx.fill();
+  ctx.globalAlpha = 1;
+
+  // 标题
+  ctx.fillStyle = "#fff";
+  ctx.font = "bold 42px -apple-system, sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("🧠 趣味答题挑战", W / 2, 120);
+
+  // emoji
+  ctx.font = "100px sans-serif";
+  ctx.fillText(comment.emoji, W / 2, 280);
+
+  // 分数
+  ctx.font = "bold 72px -apple-system, sans-serif";
+  const scoreGrad = ctx.createLinearGradient(200, 310, 550, 380);
+  scoreGrad.addColorStop(0, "#a29bfe");
+  scoreGrad.addColorStop(1, "#fd79a8");
+  ctx.fillStyle = scoreGrad;
+  ctx.fillText(`${score} / ${questions.length}`, W / 2, 380);
+
+  // 评语
+  ctx.fillStyle = "#ccc";
+  ctx.font = "30px -apple-system, sans-serif";
+  ctx.fillText(comment.text, W / 2, 450);
+
+  // 分割线
+  ctx.strokeStyle = "rgba(255,255,255,0.1)";
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(80, 500); ctx.lineTo(W - 80, 500); ctx.stroke();
+
+  // 逐题结果
+  ctx.textAlign = "left";
+  ctx.font = "22px -apple-system, sans-serif";
+  let y = 555;
+  questions.forEach((q, i) => {
+    const icon = results[i] ? "✅" : "❌";
+    ctx.fillStyle = "rgba(255,255,255,0.7)";
+    ctx.fillText(`${icon}  ${q.q}`, 80, y);
+    y += 48;
+  });
+
+  // 日期
+  ctx.textAlign = "center";
+  ctx.fillStyle = "rgba(255,255,255,0.3)";
+  ctx.font = "20px -apple-system, sans-serif";
+  const now = new Date();
+  ctx.fillText(`${now.getFullYear()}/${now.getMonth()+1}/${now.getDate()}`, W / 2, H - 60);
+
+  document.getElementById("cardOverlay").classList.add("active");
+}
+
+function closeCard() {
+  document.getElementById("cardOverlay").classList.remove("active");
+}
+
+function downloadCard() {
+  const canvas = document.getElementById("cardCanvas");
+  const link = document.createElement("a");
+  link.download = "答题成绩.png";
+  link.href = canvas.toDataURL("image/png");
+  link.click();
+}
+
+function restartQuiz() {
+  document.getElementById("resultScreen").classList.remove("active");
+  document.getElementById("startScreen").style.display = "block";
+  document.getElementById("questionContainer").innerHTML = "";
+}
+</script>
+</body>
+</html>
