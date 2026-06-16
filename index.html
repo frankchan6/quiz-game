@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>🧠 趣味答题挑战</title>
+<title>🧠 专属答题挑战</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
@@ -17,6 +17,7 @@
     --text: #f5f5f5;
     --text-dim: #999;
     --radius: 16px;
+    --pink: #fd79a8;
   }
 
   body {
@@ -36,6 +37,62 @@
     padding: 20px;
     position: relative;
   }
+
+  /* ====== 密码页 ====== */
+  .password-screen {
+    text-align: center;
+    animation: fadeUp 0.6s ease;
+  }
+  .password-screen h1 {
+    font-size: 2em;
+    margin-bottom: 8px;
+  }
+  .password-screen .hint {
+    color: var(--text-dim);
+    font-size: 0.95em;
+    margin-bottom: 32px;
+  }
+  .password-screen .hint .heart { color: var(--pink); }
+  .pwd-input-group {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+  .pwd-digit {
+    width: 44px;
+    height: 56px;
+    background: var(--card-bg);
+    border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    color: var(--text);
+    font-size: 1.6em;
+    text-align: center;
+    outline: none;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+  .pwd-digit:focus {
+    border-color: var(--pink);
+  }
+  .pwd-error {
+    color: var(--wrong);
+    font-size: 0.9em;
+    min-height: 24px;
+    margin-bottom: 12px;
+  }
+  .pwd-btn {
+    background: linear-gradient(135deg, var(--pink), #e84393);
+    color: #fff;
+    border: none;
+    padding: 14px 48px;
+    font-size: 1.1em;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.15s;
+    box-shadow: 0 4px 20px rgba(253, 121, 168, 0.4);
+  }
+  .pwd-btn:active { transform: scale(0.95); }
 
   /* ====== 开始页 ====== */
   .start-screen {
@@ -75,7 +132,7 @@
   }
   .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--accent), var(--accent-light));
+    background: linear-gradient(90deg, var(--accent), var(--pink));
     border-radius: 3px;
     transition: width 0.4s ease;
   }
@@ -93,9 +150,9 @@
     font-weight: 600;
   }
   .question-text {
-    font-size: 1.35em;
+    font-size: 1.3em;
     font-weight: 700;
-    line-height: 1.5;
+    line-height: 1.6;
     margin-bottom: 28px;
   }
 
@@ -151,7 +208,7 @@
   .result-score {
     font-size: 3em;
     font-weight: 800;
-    background: linear-gradient(135deg, var(--accent-light), #fd79a8);
+    background: linear-gradient(135deg, var(--accent-light), var(--pink));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -163,7 +220,6 @@
     margin-bottom: 32px;
     min-height: 2em;
   }
-
   .action-btns { display: flex; flex-direction: column; gap: 14px; }
   .action-btn {
     background: var(--card-bg);
@@ -176,10 +232,84 @@
     transition: all 0.2s;
   }
   .action-btn:active { transform: scale(0.97); }
-  .action-btn.primary {
-    background: linear-gradient(135deg, var(--accent), #8e7cf8);
-    border-color: transparent;
-    box-shadow: 0 4px 16px rgba(108, 92, 231, 0.3);
+
+  /* ====== 表白页 ====== */
+  .confession-screen {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: radial-gradient(ellipse at center, #2d1b3d 0%, #0f0f1a 70%);
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+    padding: 30px;
+    overflow: hidden;
+  }
+  .confession-screen.active { display: flex; }
+
+  .confession-text {
+    font-size: 1.8em;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 12px;
+    z-index: 1;
+    animation: fadeUp 1s ease 0.5s both;
+  }
+  .confession-sub {
+    font-size: 1.1em;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 40px;
+    z-index: 1;
+    animation: fadeUp 1s ease 1s both;
+  }
+  .confession-date {
+    font-size: 0.9em;
+    color: rgba(255,255,255,0.4);
+    z-index: 1;
+    animation: fadeUp 1s ease 1.5s both;
+  }
+
+  /* 浮动爱心 */
+  .floating-hearts {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+  }
+  .floating-heart {
+    position: absolute;
+    bottom: -40px;
+    font-size: 1.5em;
+    animation: floatUp linear infinite;
+    opacity: 0.7;
+  }
+
+  /* 大爱心 */
+  .big-heart {
+    font-size: 5em;
+    z-index: 1;
+    animation: heartbeat 1.2s ease-in-out infinite, fadeUp 0.8s ease both;
+    margin-bottom: 20px;
+  }
+
+  @keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    15%      { transform: scale(1.15); }
+    30%      { transform: scale(1); }
+    45%      { transform: scale(1.1); }
+  }
+  @keyframes floatUp {
+    0%   { opacity: 0.7; transform: translateY(0) rotate(0deg) scale(1); }
+    100% { opacity: 0; transform: translateY(-100vh) rotate(45deg) scale(0.5); }
+  }
+
+  /* 不愿意按钮逃跑 */
+  .no-btn.running {
+    position: absolute;
+    transition: none;
   }
 
   /* ====== 卡片弹窗 ====== */
@@ -188,7 +318,7 @@
     position: fixed;
     inset: 0;
     background: rgba(0,0,0,0.7);
-    z-index: 100;
+    z-index: 300;
     justify-content: center;
     align-items: center;
     flex-direction: column;
@@ -257,12 +387,28 @@
 </head>
 <body>
 
+<!-- ====== 密码页 ====== -->
 <div class="container">
-  <!-- 开始页 -->
-  <div class="start-screen" id="startScreen">
-    <h1>🧠 趣味答题</h1>
-    <p class="subtitle">5道题测测你的知识储备</p>
-    <button class="start-btn" onclick="startQuiz()">开始挑战 🚀</button>
+  <div class="password-screen" id="passwordScreen">
+    <h1>🔐 专属密码</h1>
+    <p class="hint">输入我们在一起的 <span class="heart">纪念日</span> 吧</p>
+    <div class="pwd-input-group">
+      <input class="pwd-digit" type="tel" maxlength="1" inputmode="numeric" autofocus>
+      <input class="pwd-digit" type="tel" maxlength="1" inputmode="numeric">
+      <input class="pwd-digit" type="tel" maxlength="1" inputmode="numeric">
+      <input class="pwd-digit" type="tel" maxlength="1" inputmode="numeric">
+      <input class="pwd-digit" type="tel" maxlength="1" inputmode="numeric">
+      <input class="pwd-digit" type="tel" maxlength="1" inputmode="numeric">
+    </div>
+    <div class="pwd-error" id="pwdError"></div>
+    <button class="pwd-btn" onclick="checkPassword()">解锁 💕</button>
+  </div>
+
+  <!-- ====== 开始页 ====== -->
+  <div class="start-screen" id="startScreen" style="display:none">
+    <h1>🧠 专属答题</h1>
+    <p class="subtitle">关于我们的小测试，准备好了吗？</p>
+    <button class="start-btn" onclick="startQuiz()">开始答题 🚀</button>
   </div>
 
   <!-- 进度条 -->
@@ -279,7 +425,6 @@
     <div class="result-score" id="resultScore"></div>
     <div class="result-comment" id="resultComment"></div>
     <div class="action-btns">
-      <button class="action-btn primary" onclick="showCard()">🎴 生成分享卡片</button>
       <button class="action-btn" onclick="restartQuiz()">🔄 再来一次</button>
     </div>
   </div>
@@ -288,59 +433,109 @@
 <!-- 纸屑 -->
 <div class="confetti-container" id="confettiContainer"></div>
 
+<!-- ====== 表白页 ====== -->
+<div class="confession-screen" id="confessionScreen">
+  <div class="floating-hearts" id="floatingHearts"></div>
+  <div class="big-heart">❤️</div>
+  <div class="confession-text">晓帆，我喜欢你</div>
+  <div class="confession-sub">从今天起，我们一起走下去吧 💕</div>
+  <div class="confession-date" id="confessionDate"></div>
+</div>
+
 <!-- 卡片弹窗 -->
 <div class="card-overlay" id="cardOverlay">
   <canvas id="cardCanvas" width="750" height="1000"></canvas>
   <p class="save-hint">💡 长按图片或点击下方按钮保存</p>
   <button class="close-btn" onclick="closeCard()">关闭</button>
-  <button class="action-btn primary" style="margin-top:12px;max-width:200px" onclick="downloadCard()">💾 保存图片</button>
 </div>
 
 <script>
+// ========== 密码验证 ==========
+const CORRECT_PASSWORD = "260531";
+const digits = document.querySelectorAll(".pwd-digit");
+
+// 自动跳转下一个输入框
+digits.forEach((input, idx) => {
+  input.addEventListener("input", () => {
+    if (input.value && idx < digits.length - 1) {
+      digits[idx + 1].focus();
+    }
+  });
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Backspace" && !input.value && idx > 0) {
+      digits[idx - 1].focus();
+    }
+  });
+});
+
+function checkPassword() {
+  const pwd = Array.from(digits).map(d => d.value).join("");
+  if (pwd === CORRECT_PASSWORD) {
+    document.getElementById("passwordScreen").style.display = "none";
+    document.getElementById("startScreen").style.display = "block";
+  } else {
+    const err = document.getElementById("pwdError");
+    err.textContent = "密码不对哦，再想想 🤔";
+    // 抖动输入框
+    digits.forEach(d => { d.style.animation = "shake 0.4s ease"; setTimeout(() => d.style.animation = "", 400); });
+  }
+}
+
 // ========== 题库 ==========
 const questions = [
   {
-    q: "世界上最大的海洋是？",
-    options: ["大西洋", "太平洋", "印度洋", "北冰洋"],
-    answer: 1
-  },
-  {
-    q: "Python 编程语言的创始人是谁？",
-    options: ["James Gosling", "Guido van Rossum", "Brendan Eich", "Dennis Ritchie"],
-    answer: 1
-  },
-  {
-    q: "光年是什么单位？",
-    options: ["时间单位", "速度单位", "距离单位", "亮度单位"],
+    q: "以下哪位朋友和我一起度过了本科和研究生的时光，还一起去了日本？",
+    options: ["李思宇", "李日文", "李旻", "李敏镐"],
     answer: 2
   },
   {
-    q: "以下哪个国家的国旗不是矩形？",
-    options: ["瑞士", "日本", "孟加拉国", "希腊"],
-    answer: 0
+    q: "以下哪位朋友在我和你第一次见面时，作为我的挡箭牌？",
+    options: ["李思宇", "李旻", "刘永乐", "陈昀"],
+    answer: 2
   },
   {
-    q: "人体最大的器官是？",
-    options: ["肝脏", "大脑", "皮肤", "肺"],
+    q: "我的朋友里谁在美国读博？",
+    options: ["刘韫斐", "李旻", "刘永乐", "陈昀"],
+    answer: 3
+  },
+  {
+    q: "我的朋友里谁比较喜欢约饭组局？",
+    options: ["李思宇", "李旻", "刘永乐", "陈昀"],
     answer: 2
+  },
+  {
+    q: "我有个去北海道遇上了海啸的朋友，是谁？",
+    options: ["李思宇", "李旻", "刘永乐", "陈昀"],
+    answer: 2
+  },
+  {
+    q: "我有个朋友是 ESFP，请问是？",
+    options: ["石晓帆", "晓帆", "小番", "🍅"],
+    allCorrect: true
+  },
+  {
+    q: "我有个朋友来自新疆，很喜欢吃饭，请问是？",
+    options: ["石晓帆", "晓帆", "小番", "🍅"],
+    allCorrect: true
+  },
+  {
+    q: "我有个朋友宇宙爆炸无敌！这个来自新疆很喜欢吃饭的朋友，请问是？",
+    options: ["小笼包", "陈鑫松", "分明就是你自己", "🍅狂热粉丝"],
+    allCorrect: true
+  },
+  {
+    q: "晓帆，我好喜欢你，你愿意做我女朋友吗？",
+    options: ["愿意 💕", "不愿意"],
+    isConfession: true
   }
 ];
 
 const LABELS = ["A", "B", "C", "D"];
 
-const COMMENTS = [
-  { min: 0, max: 0, emoji: "😅", text: "0分...你确定你不是来捣乱的？" },
-  { min: 1, max: 1, emoji: "🤔", text: "1分，看来你需要多读点书哦" },
-  { min: 2, max: 2, emoji: "😊", text: "2分，还有很大进步空间！" },
-  { min: 3, max: 3, emoji: "😎", text: "3分，还不错，有两把刷子！" },
-  { min: 4, max: 4, emoji: "🔥", text: "4分，很强！差一点就满分了！" },
-  { min: 5, max: 5, emoji: "🏆", text: "全对！你是不是偷看答案了？😏" }
-];
-
 let currentQ = 0;
 let score = 0;
 let answered = false;
-let results = []; // 记录每题结果: true=对, false=错
+let results = [];
 
 // ========== 答题逻辑 ==========
 function startQuiz() {
@@ -375,46 +570,105 @@ function renderQuestion() {
 
 function selectAnswer(idx) {
   if (answered) return;
-  answered = true;
-
   const q = questions[currentQ];
+
+  // 表白题特殊处理
+  if (q.isConfession) {
+    if (idx === 0) {
+      // 选了"愿意"
+      answered = true;
+      const options = document.querySelectorAll(".option");
+      options[0].classList.add("correct");
+      options[1].classList.add("disabled");
+      results.push(true);
+      score++;
+      setTimeout(() => showConfession(), 800);
+    } else {
+      // 选了"不愿意"——不让选！
+      const noBtn = document.querySelectorAll(".option")[1];
+      noBtn.style.animation = "shake 0.4s ease";
+      setTimeout(() => noBtn.style.animation = "", 400);
+
+      // 显示提示
+      const container = document.getElementById("questionContainer");
+      let hint = container.querySelector(".no-hint");
+      if (!hint) {
+        hint = document.createElement("div");
+        hint.className = "no-hint";
+        hint.style.cssText = "text-align:center;margin-top:20px;color:var(--pink);font-size:1.1em;animation:fadeUp 0.3s ease";
+        hint.textContent = "不可以哦～再选一次 💕";
+        container.appendChild(hint);
+      }
+    }
+    return;
+  }
+
+  // 普通题
+  answered = true;
   const options = document.querySelectorAll(".option");
-  const correct = q.answer;
+  const isCorrect = q.allCorrect ? true : (idx === q.answer);
 
   options.forEach((opt, i) => {
     opt.classList.add("disabled");
-    if (i === correct) opt.classList.add("correct");
-    if (i === idx && i !== correct) opt.classList.add("wrong");
+    if (q.allCorrect) {
+      if (i === idx) opt.classList.add("correct");
+    } else {
+      if (i === q.answer) opt.classList.add("correct");
+      if (i === idx && i !== q.answer) opt.classList.add("wrong");
+    }
   });
 
-  const isCorrect = idx === correct;
   if (isCorrect) score++;
   results.push(isCorrect);
 
   setTimeout(() => {
     currentQ++;
-    if (currentQ < questions.length) {
-      renderQuestion();
-    } else {
-      showResult();
-    }
+    renderQuestion();
   }, 800);
 }
 
-// ========== 结果展示 ==========
+// ========== 表白页 ==========
+function showConfession() {
+  document.getElementById("questionContainer").innerHTML = "";
+  document.getElementById("progressBar").style.display = "none";
+
+  const screen = document.getElementById("confessionScreen");
+  screen.classList.add("active");
+
+  // 显示日期
+  document.getElementById("confessionDate").textContent = "2026.05.31 — 我们的故事从这里开始 ✨";
+
+  // 浮动爱心
+  const container = document.getElementById("floatingHearts");
+  const hearts = ["💕", "💗", "💖", "💘", "❤️", "🩷", "💝"];
+  for (let i = 0; i < 25; i++) {
+    const h = document.createElement("div");
+    h.className = "floating-heart";
+    h.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+    h.style.left = Math.random() * 100 + "vw";
+    h.style.fontSize = (Math.random() * 1.2 + 0.8) + "em";
+    h.style.animationDuration = (Math.random() * 3 + 4) + "s";
+    h.style.animationDelay = (Math.random() * 3) + "s";
+    container.appendChild(h);
+  }
+
+  // 纸屑
+  launchConfetti();
+}
+
+// ========== 结果展示（普通答题完） ==========
 function showResult() {
   document.getElementById("progressFill").style.width = "100%";
   document.getElementById("questionContainer").innerHTML = "";
   document.getElementById("progressBar").style.display = "none";
 
-  const comment = COMMENTS.find(c => score >= c.min && score <= c.max);
+  const comment = getComment(score);
   const screen = document.getElementById("resultScreen");
   screen.classList.add("active");
 
   document.getElementById("resultEmoji").textContent = comment.emoji;
   document.getElementById("resultScore").textContent = `${score} / ${questions.length}`;
 
-  // 打字机效果
   const commentEl = document.getElementById("resultComment");
   commentEl.textContent = "";
   let i = 0;
@@ -425,17 +679,23 @@ function showResult() {
     if (i >= text.length) clearInterval(typeInterval);
   }, 50);
 
-  // 庆祝动画
-  if (score >= 3) launchConfetti();
+  if (score >= 6) launchConfetti();
+}
+
+function getComment(s) {
+  if (s <= 2) return { emoji: "😅", text: "你是不是还不够了解我？没关系，我们还有很长时间 💕" };
+  if (s <= 5) return { emoji: "😊", text: "还不错哦，继续加油～" };
+  if (s <= 7) return { emoji: "🔥", text: "很了解我嘛！看来你很在意我 ❤️" };
+  return { emoji: "🏆", text: "满分！你果然是最懂我的人 💗" };
 }
 
 // ========== 纸屑动画 ==========
 function launchConfetti() {
   const container = document.getElementById("confettiContainer");
   container.innerHTML = "";
-  const colors = ["#6c5ce7", "#fd79a8", "#00b894", "#fdcb6e", "#e17055", "#74b9ff"];
+  const colors = ["#6c5ce7", "#fd79a8", "#00b894", "#fdcb6e", "#e17055", "#74b9ff", "#ff6b81"];
 
-  for (let i = 0; i < 80; i++) {
+  for (let i = 0; i < 100; i++) {
     const c = document.createElement("div");
     c.className = "confetti";
     c.style.left = Math.random() * 100 + "vw";
@@ -446,43 +706,37 @@ function launchConfetti() {
     c.style.animation = `confettiFall ${Math.random() * 2 + 1.5}s ease-out ${Math.random() * 0.8}s forwards`;
     container.appendChild(c);
   }
-
   setTimeout(() => container.innerHTML = "", 4000);
 }
 
-// ========== 分享卡片 ==========
+// ========== 卡片 ==========
 function showCard() {
   const canvas = document.getElementById("cardCanvas");
   const ctx = canvas.getContext("2d");
   const W = canvas.width, H = canvas.height;
-  const comment = COMMENTS.find(c => score >= c.min && score <= c.max);
+  const comment = getComment(score);
 
-  // 背景渐变
   const grad = ctx.createLinearGradient(0, 0, W, H);
   grad.addColorStop(0, "#1a1a2e");
   grad.addColorStop(1, "#16213e");
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, W, H);
 
-  // 装饰圆
   ctx.globalAlpha = 0.08;
-  ctx.fillStyle = "#6c5ce7";
-  ctx.beginPath(); ctx.arc(600, 150, 200, 0, Math.PI * 2); ctx.fill();
   ctx.fillStyle = "#fd79a8";
+  ctx.beginPath(); ctx.arc(600, 150, 200, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = "#6c5ce7";
   ctx.beginPath(); ctx.arc(150, 800, 160, 0, Math.PI * 2); ctx.fill();
   ctx.globalAlpha = 1;
 
-  // 标题
   ctx.fillStyle = "#fff";
-  ctx.font = "bold 42px -apple-system, sans-serif";
+  ctx.font = "bold 40px -apple-system, sans-serif";
   ctx.textAlign = "center";
-  ctx.fillText("🧠 趣味答题挑战", W / 2, 120);
+  ctx.fillText("🧠 专属答题挑战", W / 2, 120);
 
-  // emoji
   ctx.font = "100px sans-serif";
   ctx.fillText(comment.emoji, W / 2, 280);
 
-  // 分数
   ctx.font = "bold 72px -apple-system, sans-serif";
   const scoreGrad = ctx.createLinearGradient(200, 310, 550, 380);
   scoreGrad.addColorStop(0, "#a29bfe");
@@ -490,47 +744,39 @@ function showCard() {
   ctx.fillStyle = scoreGrad;
   ctx.fillText(`${score} / ${questions.length}`, W / 2, 380);
 
-  // 评语
   ctx.fillStyle = "#ccc";
-  ctx.font = "30px -apple-system, sans-serif";
-  ctx.fillText(comment.text, W / 2, 450);
+  ctx.font = "28px -apple-system, sans-serif";
+  ctx.fillText(comment.text, W / 2, 440);
 
-  // 分割线
   ctx.strokeStyle = "rgba(255,255,255,0.1)";
   ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(80, 500); ctx.lineTo(W - 80, 500); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(80, 490); ctx.lineTo(W - 80, 490); ctx.stroke();
 
-  // 逐题结果
   ctx.textAlign = "left";
-  ctx.font = "22px -apple-system, sans-serif";
-  let y = 555;
-  questions.forEach((q, i) => {
+  ctx.font = "20px -apple-system, sans-serif";
+  let y = 540;
+  questions.slice(0, -1).forEach((q, i) => {
     const icon = results[i] ? "✅" : "❌";
-    ctx.fillStyle = "rgba(255,255,255,0.7)";
-    ctx.fillText(`${icon}  ${q.q}`, 80, y);
-    y += 48;
+    ctx.fillStyle = "rgba(255,255,255,0.6)";
+    const displayQ = q.q.length > 20 ? q.q.slice(0, 20) + "…" : q.q;
+    ctx.fillText(`${icon} ${displayQ}`, 80, y);
+    y += 42;
   });
 
-  // 日期
   ctx.textAlign = "center";
+  ctx.fillStyle = "#fd79a8";
+  ctx.font = "bold 24px -apple-system, sans-serif";
+  ctx.fillText("💕 表白成功 💕", W / 2, y + 30);
+
   ctx.fillStyle = "rgba(255,255,255,0.3)";
   ctx.font = "20px -apple-system, sans-serif";
-  const now = new Date();
-  ctx.fillText(`${now.getFullYear()}/${now.getMonth()+1}/${now.getDate()}`, W / 2, H - 60);
+  ctx.fillText("2026.05.31", W / 2, H - 50);
 
   document.getElementById("cardOverlay").classList.add("active");
 }
 
 function closeCard() {
   document.getElementById("cardOverlay").classList.remove("active");
-}
-
-function downloadCard() {
-  const canvas = document.getElementById("cardCanvas");
-  const link = document.createElement("a");
-  link.download = "答题成绩.png";
-  link.href = canvas.toDataURL("image/png");
-  link.click();
 }
 
 function restartQuiz() {
