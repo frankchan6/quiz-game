@@ -477,6 +477,11 @@
 <!-- 纸屑 -->
 <div class="confetti-container" id="confettiContainer"></div>
 
+<!-- BGM 音频 -->
+<audio id="bgm" loop preload="auto">
+  <source src="https://cdn.pixabay.com/audio/2022/01/18/audio_d0a13f69d2.mp3" type="audio/mpeg">
+</audio>
+
 <!-- ====== 表白页 ====== -->
 <div class="confession-screen" id="confessionScreen">
   <div class="floating-hearts" id="floatingHearts"></div>
@@ -495,7 +500,13 @@
     <p>我希望能找到咱俩都舒适的相处模式，然后一直一起走下去。往后的日子可能不会像之前那么浓烈，但我们还可以慢慢把细碎的日常补齐。</p>
   </div>
 
-  <div class="confession-sign">—— 你的男朋友 🍅💕</div>
+  <div class="confession-sign">—— 你的小男孩 🍅💕</div>
+
+  <!-- BGM -->
+  <div id="musicBtn" onclick="toggleMusic()" style="position:fixed;top:16px;right:16px;z-index:999;background:rgba(255,255,255,0.15);border:none;border-radius:50%;width:40px;height:40px;font-size:1.2em;cursor:pointer;backdrop-filter:blur(8px);display:none">
+    🎵
+  </div>
+</div>
 </div>
 
 <!-- 卡片弹窗 -->
@@ -691,6 +702,19 @@ function showConfession() {
   const screen = document.getElementById("confessionScreen");
   screen.classList.add("active");
 
+  // 播放 BGM
+  const bgm = document.getElementById("bgm");
+  const musicBtn = document.getElementById("musicBtn");
+  bgm.volume = 0.5;
+  bgm.play().then(() => {
+    musicBtn.style.display = "block";
+    musicBtn.textContent = "🎵";
+  }).catch(() => {
+    // 自动播放被拦截，显示按钮让用户手动触发
+    musicBtn.style.display = "block";
+    musicBtn.textContent = "🔇";
+  });
+
   // 浮动爱心+番茄
   const container = document.getElementById("floatingHearts");
   const hearts = ["💕", "💗", "💖", "💘", "❤️", "🩷", "💝", "🍅", "🍅", "🍅"];
@@ -707,6 +731,19 @@ function showConfession() {
 
   // 纸屑
   launchConfetti();
+}
+
+// ========== 音乐控制 ==========
+function toggleMusic() {
+  const bgm = document.getElementById("bgm");
+  const btn = document.getElementById("musicBtn");
+  if (bgm.paused) {
+    bgm.play();
+    btn.textContent = "🎵";
+  } else {
+    bgm.pause();
+    btn.textContent = "🔇";
+  }
 }
 
 // ========== 结果展示（普通答题完） ==========
