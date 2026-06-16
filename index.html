@@ -262,35 +262,54 @@
     inset: 0;
     z-index: 200;
     background: radial-gradient(ellipse at center, #2d1b3d 0%, #0f0f1a 70%);
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     flex-direction: column;
     text-align: center;
-    padding: 30px;
-    overflow: hidden;
+    padding: 50px 24px 40px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   .confession-screen.active { display: flex; }
 
-  .confession-text {
-    font-size: 1.8em;
+  .confession-header {
+    z-index: 1;
+    margin-bottom: 24px;
+    flex-shrink: 0;
+  }
+  .confession-title {
+    font-size: 1.6em;
     font-weight: 700;
     color: #fff;
-    margin-bottom: 12px;
-    z-index: 1;
-    animation: fadeUp 1s ease 0.5s both;
-  }
-  .confession-sub {
-    font-size: 1.1em;
-    color: rgba(255,255,255,0.7);
-    margin-bottom: 40px;
-    z-index: 1;
-    animation: fadeUp 1s ease 1s both;
+    margin-bottom: 4px;
+    animation: fadeUp 1s ease 0.3s both;
   }
   .confession-date {
-    font-size: 0.9em;
+    font-size: 0.85em;
     color: rgba(255,255,255,0.4);
+    animation: fadeUp 1s ease 0.6s both;
+  }
+  .confession-body {
     z-index: 1;
-    animation: fadeUp 1s ease 1.5s both;
+    max-width: 380px;
+    animation: fadeUp 1.2s ease 0.8s both;
+  }
+  .confession-body p {
+    font-size: 1em;
+    line-height: 1.85;
+    color: rgba(255,255,255,0.85);
+    margin-bottom: 18px;
+    text-align: left;
+    text-indent: 2em;
+  }
+  .confession-sign {
+    z-index: 1;
+    margin-top: 8px;
+    font-size: 1.1em;
+    color: var(--pink);
+    font-weight: 600;
+    animation: fadeUp 1s ease 1.2s both;
+    flex-shrink: 0;
   }
 
   /* 浮动爱心 */
@@ -416,7 +435,7 @@
 <div class="container">
   <div class="password-screen" id="passwordScreen">
     <h1>🍅 专属密码</h1>
-    <p class="hint">小番，输入我们在一起的 <span class="heart">纪念日</span> 吧</p>
+    <p class="hint">晓帆，输入我们在一起的 <span class="heart">纪念日</span> 吧</p>
     <div class="pwd-input-group">
       <input class="pwd-digit" type="tel" maxlength="1" inputmode="numeric" autofocus>
       <input class="pwd-digit" type="tel" maxlength="1" inputmode="numeric">
@@ -432,7 +451,7 @@
   <!-- ====== 开始页 ====== -->
   <div class="start-screen" id="startScreen" style="display:none">
     <h1>🍅 专属答题</h1>
-    <p class="subtitle">小番专属测试，准备好了吗？</p>
+    <p class="subtitle">晓帆专属测试，准备好了吗？</p>
     <button class="start-btn" onclick="startQuiz()">开始答题 🍅</button>
   </div>
 
@@ -461,10 +480,22 @@
 <!-- ====== 表白页 ====== -->
 <div class="confession-screen" id="confessionScreen">
   <div class="floating-hearts" id="floatingHearts"></div>
-  <div class="big-heart">🍅</div>
-  <div class="confession-text">小番，我喜欢你</div>
-  <div class="confession-sub">从今天起，我们一起走下去吧 🍅💕</div>
-  <div class="confession-date" id="confessionDate"></div>
+
+  <div class="confession-header">
+    <div class="big-heart">🍅</div>
+    <div class="confession-title">晓帆，有些话想对你说</div>
+    <div class="confession-date">🍅 2026.05.31 — 我们的故事从这里开始 🍅</div>
+  </div>
+
+  <div class="confession-body">
+    <p>老实说这是一次突发奇想，很仓促。不过自从在一起，我就想怎么给你一个真切的表白，倒也不算临时起意。</p>
+    <p>我一直觉得表白需要理清我全部的心意，如果匆忙地向你表达，我自觉不够真诚。但我真的是很慢吞吞的人，理清思绪不知道要多久，我不想总是拖着，我不想让你的期待逐渐落空，所以这次就先表达一下（我着急了）。</p>
+    <p>但这次也不是正式哦，只是我想先行预告一下，也是希望能先哄你开心一次。我觉得我们还有好长一段路要走，往后我还有无数次机会，认认真真、完完整整跟你表白。</p>
+    <p>以及我还想说的是，我近期越发觉得自己力不从心，我想是我习惯了一个人，没谈过恋爱，不知道该怎么处理一份感情。虽然你一直在支持我，但我不想那样消耗你的热情，所以我说我觉得亏欠。我还有好多要学习的，可想而知后续一定会磕磕绊绊的。</p>
+    <p>我希望能找到咱俩都舒适的相处模式，然后一直一起走下去。往后的日子可能不会像之前那么浓烈，但我们还可以慢慢把细碎的日常补齐。</p>
+  </div>
+
+  <div class="confession-sign">—— 你的男朋友 🍅💕</div>
 </div>
 
 <!-- 卡片弹窗 -->
@@ -500,7 +531,7 @@ function checkPassword() {
     document.getElementById("startScreen").style.display = "block";
   } else {
     const err = document.getElementById("pwdError");
-    err.textContent = "密码不对哦，小番再想想 🍅";
+    err.textContent = "密码不对哦，晓帆再想想 🍅";
     // 抖动输入框
     digits.forEach(d => { d.style.animation = "shake 0.4s ease"; setTimeout(() => d.style.animation = "", 400); });
   }
@@ -621,7 +652,7 @@ function selectAnswer(idx) {
         hint = document.createElement("div");
         hint.className = "no-hint";
         hint.style.cssText = "text-align:center;margin-top:20px;color:var(--pink);font-size:1.1em;animation:fadeUp 0.3s ease";
-        hint.textContent = "🍅 小番不许选这个！再选一次～";
+        hint.textContent = "🍅 晓帆不许选这个！再选一次～";
         container.appendChild(hint);
       }
     }
@@ -659,9 +690,6 @@ function showConfession() {
 
   const screen = document.getElementById("confessionScreen");
   screen.classList.add("active");
-
-  // 显示日期
-  document.getElementById("confessionDate").textContent = "🍅 2026.05.31 — 我们的故事从这里开始 🍅";
 
   // 浮动爱心+番茄
   const container = document.getElementById("floatingHearts");
