@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>甜蜜语录</title>
+<style>
+  :root {
+    --bg: #0f0f1a;
+    --card-bg: #1a1a2e;
+    --accent: #6c5ce7;
+    --pink: #fd79a8;
+    --text: #f5f5f5;
+    --radius: 16px;
+    --tag-sweet: #fd79a8;
+    --tag-funny: #fdcb6e;
+    --tag-daily: #74b9ff;
+    --tag-make-up: #a29bfe;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 80px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #2d1b4e 100%);
+    padding: 20px 16px 16px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(108, 92, 231, 0.2);
+  }
+  .header h1 {
+    font-size: 1.5rem;
+    background: linear-gradient(135deg, var(--pink), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .header-sub {
+    font-size: 0.8rem;
+    color: rgba(245,245,245,0.5);
+    margin-top: 4px;
+  }
+
+  /* Toolbar */
+  .toolbar {
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .search-bar {
+    display: flex;
+    gap: 8px;
+  }
+  .search-bar input {
+    flex: 1;
+    background: var(--card-bg);
+    border: 1px solid rgba(108,92,231,0.3);
+    border-radius: 12px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+  .search-bar input:focus {
+    border-color: var(--accent);
+  }
+  .search-bar input::placeholder { color: rgba(245,245,245,0.3); }
+
+  .btn {
+    border: none;
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .btn:active { transform: scale(0.96); }
+  .btn-accent {
+    background: linear-gradient(135deg, var(--accent), #a29bfe);
+    color: white;
+  }
+  .btn-pink {
+    background: linear-gradient(135deg, var(--pink), #e84393);
+    color: white;
+  }
+  .btn-ghost {
+    background: rgba(108,92,231,0.15);
+    color: var(--accent);
+    border: 1px solid rgba(108,92,231,0.3);
+  }
+  .btn-small {
+    padding: 6px 10px;
+    font-size: 0.75rem;
+    border-radius: 8px;
+  }
+
+  .filter-row {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .filter-row::-webkit-scrollbar { display: none; }
+  .filter-chip {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    background: rgba(255,255,255,0.06);
+    color: rgba(245,245,245,0.6);
+    border: 1px solid rgba(255,255,255,0.08);
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .filter-chip.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+  .filter-chip:active { transform: scale(0.95); }
+
+  .action-row {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    padding: 0 16px 8px;
+  }
+
+  /* Quotes List */
+  .quotes-list {
+    padding: 0 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .quote-card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 16px;
+    position: relative;
+    animation: fadeSlideUp 0.4s ease both;
+    border: 1px solid rgba(108,92,231,0.12);
+    transition: transform 0.2s;
+  }
+  .quote-card:active { transform: scale(0.98); }
+
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Speech Bubble */
+  .speech-bubble {
+    background: rgba(108,92,231,0.1);
+    border: 1px solid rgba(108,92,231,0.2);
+    border-radius: 14px;
+    padding: 14px 16px;
+    position: relative;
+    margin-bottom: 12px;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--text);
+  }
+  .speech-bubble::after {
+    content: "";
+    position: absolute;
+    bottom: -8px;
+    left: 28px;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid rgba(108,92,231,0.2);
+  }
+  .speech-bubble::before {
+    content: "";
+    position: absolute;
+    bottom: -7px;
+    left: 29px;
+    width: 0;
+    height: 0;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-top: 7px solid rgba(108,92,231,0.1);
+    z-index: 1;
+  }
+
+  .quote-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 4px;
+  }
+  .quote-meta-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .speaker {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--pink);
+  }
+  .speaker.me { color: var(--accent); }
+  .quote-date {
+    font-size: 0.75rem;
+    color: rgba(245,245,245,0.35);
+  }
+  .tag-badge {
+    font-size: 0.7rem;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+  }
+  .tag-甜蜜 { background: rgba(253,121,168,0.2); color: var(--tag-sweet); }
+  .tag-搞笑 { background: rgba(253,203,110,0.2); color: var(--tag-funny); }
+  .tag-日常 { background: rgba(116,185,255,0.2); color: var(--tag-daily); }
+  .tag-吵架后和好 { background: rgba(162,155,254,0.2); color: var(--tag-make-up); }
+
+  .delete-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255,107,107,0.15);
+    border: none;
+    color: #ff6b6b;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    opacity: 0.6;
+  }
+  .delete-btn:active {
+    opacity: 1;
+    background: rgba(255,107,107,0.3);
+    transform: scale(1.1);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: rgba(245,245,245,0.3);
+  }
+  .empty-state .emoji { font-size: 3rem; margin-bottom: 12px; }
+  .empty-state p { font-size: 0.9rem; }
+
+  .count-info {
+    text-align: center;
+    font-size: 0.75rem;
+    color: rgba(245,245,245,0.3);
+    padding: 8px 0;
+  }
+
+  /* Add Modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 200;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    animation: fadeIn 0.2s ease;
+  }
+  .modal-overlay.show { display: flex; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .modal {
+    background: var(--card-bg);
+    border-radius: 24px 24px 0 0;
+    width: 100%;
+    max-width: 500px;
+    padding: 24px 20px 32px;
+    animation: slideUp 0.3s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  .modal h2 {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .form-group {
+    margin-bottom: 16px;
+  }
+  .form-group label {
+    display: block;
+    font-size: 0.8rem;
+    color: rgba(245,245,245,0.5);
+    margin-bottom: 6px;
+  }
+  .form-group textarea,
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(108,92,231,0.2);
+    border-radius: 12px;
+    padding: 12px;
+    color: var(--text);
+    font-size: 0.9rem;
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.3s;
+  }
+  .form-group textarea { resize: vertical; min-height: 80px; }
+  .form-group textarea:focus,
+  .form-group input:focus,
+  .form-group select:focus {
+    border-color: var(--accent);
+  }
+  .form-group select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23999' viewBox='0 0 16 16'%3E%3Cpath d='M1.5 5.5l6.5 6.5 6.5-6.5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+  }
+  .form-group select option {
+    background: var(--card-bg);
+    color: var(--text);
+  }
+
+  .form-row {
+    display: flex;
+    gap: 10px;
+  }
+  .form-row .form-group { flex: 1; }
+
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .modal-actions .btn { flex: 1; padding: 12px; font-size: 0.95rem; }
+
+  /* Random Quote Overlay */
+  .random-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 300;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .random-overlay.show { display: flex; }
+
+  .random-card {
+    background: var(--card-bg);
+    border-radius: 24px;
+    padding: 32px 24px;
+    max-width: 380px;
+    width: 100%;
+    text-align: center;
+    position: relative;
+    animation: flipIn 0.5s ease;
+    border: 2px solid rgba(108,92,231,0.3);
+    box-shadow: 0 20px 60px rgba(108,92,231,0.2);
+  }
+  @keyframes flipIn {
+    0% { opacity: 0; transform: perspective(600px) rotateY(90deg) scale(0.8); }
+    60% { transform: perspective(600px) rotateY(-10deg) scale(1.02); }
+    100% { opacity: 1; transform: perspective(600px) rotateY(0deg) scale(1); }
+  }
+
+  .random-card .random-emoji {
+    font-size: 2.5rem;
+    margin-bottom: 16px;
+  }
+  .random-card .random-text {
+    font-size: 1.15rem;
+    line-height: 1.7;
+    margin-bottom: 20px;
+    color: var(--text);
+  }
+  .random-card .random-speaker {
+    font-size: 0.9rem;
+    color: var(--pink);
+    font-weight: 600;
+  }
+  .random-card .random-speaker.me { color: var(--accent); }
+  .random-card .random-tag {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 0.75rem;
+    padding: 4px 12px;
+    border-radius: 12px;
+  }
+  .random-card .random-close {
+    margin-top: 24px;
+    background: rgba(108,92,231,0.2);
+    border: 1px solid rgba(108,92,231,0.3);
+    color: var(--accent);
+    padding: 10px 32px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .random-card .random-close:active {
+    transform: scale(0.96);
+    background: rgba(108,92,231,0.3);
+  }
+
+  /* Bottom Nav */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(26,26,46,0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(108,92,231,0.15);
+    display: flex;
+    justify-content: space-around;
+    padding: 8px 0;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom));
+    z-index: 100;
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: rgba(245,245,245,0.4);
+    font-size: 0.65rem;
+    padding: 4px 12px;
+    transition: color 0.3s;
+    gap: 2px;
+  }
+  .nav-item.active {
+    color: var(--pink);
+  }
+  .nav-item .nav-icon {
+    font-size: 1.3rem;
+  }
+
+  /* Confirm Dialog */
+  .confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 250;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .confirm-overlay.show { display: flex; }
+  .confirm-box {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 28px 24px 20px;
+    text-align: center;
+    max-width: 300px;
+    width: 100%;
+    animation: slideUp 0.25s ease;
+  }
+  .confirm-box p {
+    font-size: 1rem;
+    margin-bottom: 20px;
+    color: rgba(245,245,245,0.8);
+  }
+  .confirm-actions {
+    display: flex;
+    gap: 10px;
+  }
+  .confirm-actions .btn { flex: 1; }
+  .btn-danger {
+    background: rgba(255,107,107,0.2);
+    color: #ff6b6b;
+    border: 1px solid rgba(255,107,107,0.3);
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--accent);
+    color: white;
+    padding: 10px 24px;
+    border-radius: 24px;
+    font-size: 0.85rem;
+    z-index: 400;
+    opacity: 0;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🍅 甜蜜语录</h1>
+  <div class="header-sub">记录我们的每一句甜言蜜语</div>
+</div>
+
+<div class="toolbar">
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="搜索语录...">
+    <button class="btn btn-ghost" onclick="openAddModal()">+ 添加</button>
+  </div>
+  <div class="filter-row" id="filterRow">
+    <span class="filter-chip active" data-filter="all" onclick="setFilter('all', this)">全部</span>
+    <span class="filter-chip" data-filter="who:晓帆" onclick="setFilter('who:晓帆', this)">🍅 晓帆</span>
+    <span class="filter-chip" data-filter="who:我" onclick="setFilter('who:我', this)">💜 我</span>
+    <span class="filter-chip" data-filter="tag:甜蜜" onclick="setFilter('tag:甜蜜', this)">💕 甜蜜</span>
+    <span class="filter-chip" data-filter="tag:搞笑" onclick="setFilter('tag:搞笑', this)">😂 搞笑</span>
+    <span class="filter-chip" data-filter="tag:日常" onclick="setFilter('tag:日常', this)">☀️ 日常</span>
+    <span class="filter-chip" data-filter="tag:吵架后和好" onclick="setFilter('tag:吵架后和好', this)">🤝 和好</span>
+  </div>
+</div>
+
+<div class="action-row">
+  <button class="btn btn-pink" onclick="showRandomQuote()" style="flex:1;">🍅 随机一条甜言蜜语</button>
+</div>
+
+<div class="count-info" id="countInfo"></div>
+<div class="quotes-list" id="quotesList"></div>
+
+<!-- Add Modal -->
+<div class="modal-overlay" id="addModal" onclick="closeAddModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h2>🍅 添加新语录</h2>
+    <div class="form-group">
+      <label>说了什么</label>
+      <textarea id="quoteContent" placeholder="写下那句让你心动的话..."></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>谁说的</label>
+        <select id="quoteWho">
+          <option value="晓帆">晓帆</option>
+          <option value="我">我</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>日期</label>
+        <input type="date" id="quoteDate">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>分类</label>
+      <select id="quoteTag">
+        <option value="甜蜜">💕 甜蜜</option>
+        <option value="搞笑">😂 搞笑</option>
+        <option value="日常">☀️ 日常</option>
+        <option value="吵架后和好">🤝 吵架后和好</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeAddModal()">取消</button>
+      <button class="btn btn-accent" onclick="saveQuote()">保存 🍅</button>
+    </div>
+  </div>
+</div>
+
+<!-- Random Quote Overlay -->
+<div class="random-overlay" id="randomOverlay" onclick="closeRandom(event)">
+  <div class="random-card" onclick="event.stopPropagation()">
+    <div class="random-emoji">🍅</div>
+    <div class="random-text" id="randomText"></div>
+    <div class="random-speaker" id="randomSpeaker"></div>
+    <div class="random-tag tag-badge" id="randomTag"></div>
+    <br>
+    <button class="random-close" onclick="closeRandom()">好甜 💜</button>
+  </div>
+</div>
+
+<!-- Confirm Delete -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <p>确定要删除这条语录吗？</p>
+    <div class="confirm-actions">
+      <button class="btn btn-ghost" onclick="closeConfirm()">取消</button>
+      <button class="btn btn-danger" onclick="confirmDelete()">删除</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<nav class="bottom-nav">
+  <a class="nav-item" href="hub.html">
+    <span class="nav-icon">🏠</span>
+    <span>首页</span>
+  </a>
+  <a class="nav-item" href="memories.html">
+    <span class="nav-icon">📖</span>
+    <span>回忆</span>
+  </a>
+  <a class="nav-item" href="anniversary.html">
+    <span class="nav-icon">📅</span>
+    <span>纪念日</span>
+  </a>
+  <a class="nav-item" href="bucket.html">
+    <span class="nav-icon">✅</span>
+    <span>清单</span>
+  </a>
+  <a class="nav-item" href="diary.html">
+    <span class="nav-icon">📝</span>
+    <span>日记</span>
+  </a>
+  <a class="nav-item active" href="quotes.html">
+    <span class="nav-icon">🍅</span>
+    <span>语录</span>
+  </a>
+</nav>
+
+<script>
+const STORAGE_KEY = "our_quotes";
+
+const defaultQuotes = [
+  { content: "你是我见过最好的人", who: "晓帆", date: "2026-06-01", tag: "甜蜜" },
+  { content: "我想一直和你在一起", who: "我", date: "2026-06-01", tag: "甜蜜" }
+];
+
+function getQuotes() {
+  try {
+    const data = localStorage.getItem(STORAGE_KEY);
+    if (data) return JSON.parse(data);
+  } catch(e) {}
+  return null;
+}
+
+function saveQuotes(quotes) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(quotes));
+}
+
+function initQuotes() {
+  let quotes = getQuotes();
+  if (!quotes || !Array.isArray(quotes) || quotes.length === 0) {
+    quotes = defaultQuotes;
+    saveQuotes(quotes);
+  }
+  return quotes;
+}
+
+let allQuotes = initQuotes();
+let currentFilter = "all";
+let searchKeyword = "";
+let deleteTarget = null;
+
+function render() {
+  const list = document.getElementById("quotesList");
+  let filtered = [...allQuotes];
+
+  if (currentFilter !== "all") {
+    const [key, val] = currentFilter.split(":");
+    filtered = filtered.filter(q => q[key] === val);
+  }
+
+  if (searchKeyword) {
+    const kw = searchKeyword.toLowerCase();
+    filtered = filtered.filter(q =>
+      q.content.toLowerCase().includes(kw) ||
+      q.who.toLowerCase().includes(kw) ||
+      q.tag.toLowerCase().includes(kw)
+    );
+  }
+
+  document.getElementById("countInfo").textContent =
+    filtered.length === allQuotes.length
+      ? `共 ${allQuotes.length} 条语录`
+      : `显示 ${filtered.length} / ${allQuotes.length} 条`;
+
+  if (filtered.length === 0) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="emoji">🍅</div>
+        <p>${allQuotes.length === 0 ? "还没有语录，快去添加第一条吧！" : "没有找到匹配的语录"}</p>
+      </div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map((q, i) => {
+    const idx = allQuotes.indexOf(q);
+    const isMe = q.who === "我";
+    return `
+      <div class="quote-card" style="animation-delay: ${i * 0.05}s">
+        <button class="delete-btn" onclick="promptDelete(${idx})" title="删除">✕</button>
+        <div class="speech-bubble">${escapeHtml(q.content)}</div>
+        <div class="quote-meta">
+          <div class="quote-meta-left">
+            <span class="speaker ${isMe ? 'me' : ''}">${isMe ? '💜' : '🍅'} ${escapeHtml(q.who)}</span>
+            <span class="quote-date">${escapeHtml(q.date)}</span>
+          </div>
+          <span class="tag-badge tag-${q.tag}">${getTagLabel(q.tag)}</span>
+        </div>
+      </div>`;
+  }).join("");
+}
+
+function escapeHtml(text) {
+  const div = document.createElement("div");
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function getTagLabel(tag) {
+  const labels = { "甜蜜": "💕 甜蜜", "搞笑": "😂 搞笑", "日常": "☀️ 日常", "吵架后和好": "🤝 和好" };
+  return labels[tag] || tag;
+}
+
+function setFilter(filter, el) {
+  currentFilter = filter;
+  document.querySelectorAll(".filter-chip").forEach(c => c.classList.remove("active"));
+  if (el) el.classList.add("active");
+  render();
+}
+
+document.getElementById("searchInput").addEventListener("input", function(e) {
+  searchKeyword = e.target.value.trim();
+  render();
+});
+
+function openAddModal() {
+  document.getElementById("addModal").classList.add("show");
+  document.getElementById("quoteContent").value = "";
+  document.getElementById("quoteWho").value = "晓帆";
+  document.getElementById("quoteDate").value = new Date().toISOString().slice(0, 10);
+  document.getElementById("quoteTag").value = "甜蜜";
+  setTimeout(() => document.getElementById("quoteContent").focus(), 300);
+}
+
+function closeAddModal(e) {
+  if (e && e.target !== e.currentTarget) return;
+  document.getElementById("addModal").classList.remove("show");
+}
+
+function saveQuote() {
+  const content = document.getElementById("quoteContent").value.trim();
+  const who = document.getElementById("quoteWho").value;
+  const date = document.getElementById("quoteDate").value;
+  const tag = document.getElementById("quoteTag").value;
+
+  if (!content) {
+    showToast("请输入语录内容 🍅");
+    return;
+  }
+  if (!date) {
+    showToast("请选择日期");
+    return;
+  }
+
+  allQuotes.unshift({ content, who, date, tag });
+  saveQuotes(allQuotes);
+  closeAddModal();
+  render();
+  showToast("添加成功 💕");
+}
+
+function promptDelete(idx) {
+  deleteTarget = idx;
+  document.getElementById("confirmOverlay").classList.add("show");
+}
+
+function closeConfirm() {
+  deleteTarget = null;
+  document.getElementById("confirmOverlay").classList.remove("show");
+}
+
+function confirmDelete() {
+  if (deleteTarget !== null) {
+    allQuotes.splice(deleteTarget, 1);
+    saveQuotes(allQuotes);
+    render();
+    showToast("已删除");
+  }
+  closeConfirm();
+}
+
+function showRandomQuote() {
+  if (allQuotes.length === 0) {
+    showToast("还没有语录哦");
+    return;
+  }
+  const q = allQuotes[Math.floor(Math.random() * allQuotes.length)];
+  document.getElementById("randomText").textContent = q.content;
+  const speakerEl = document.getElementById("randomSpeaker");
+  speakerEl.textContent = (q.who === "我" ? "💜 " : "🍅 ") + q.who;
+  speakerEl.className = "random-speaker" + (q.who === "我" ? " me" : "");
+  const tagEl = document.getElementById("randomTag");
+  tagEl.textContent = getTagLabel(q.tag);
+  tagEl.className = "random-tag tag-badge tag-" + q.tag;
+
+  const overlay = document.getElementById("randomOverlay");
+  overlay.classList.add("show");
+  const card = overlay.querySelector(".random-card");
+  card.style.animation = "none";
+  card.offsetHeight;
+  card.style.animation = "flipIn 0.5s ease";
+}
+
+function closeRandom(e) {
+  if (e && e.target !== e.currentTarget) return;
+  document.getElementById("randomOverlay").classList.remove("show");
+}
+
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2000);
+}
+
+render();
+</script>
+</body>
+</html>

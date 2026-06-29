@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>🍅 每日一句</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0f0f1a;
+  --card-bg:#1a1a2e;
+  --accent:#6c5ce7;
+  --pink:#fd79a8;
+  --text:#f5f5f5;
+  --radius:16px;
+  --shadow:0 4px 20px rgba(0,0,0,0.3);
+}
+html,body{
+  height:100%;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  -webkit-tap-highlight-color:transparent;
+  overflow-x:hidden;
+}
+body{
+  padding-bottom:80px;
+  min-height:100vh;
+}
+.header{
+  text-align:center;
+  padding:24px 16px 12px;
+  position:sticky;
+  top:0;
+  background:var(--bg);
+  z-index:10;
+}
+.header h1{
+  font-size:1.6rem;
+  background:linear-gradient(135deg,var(--accent),var(--pink));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.header .date-display{
+  font-size:0.85rem;
+  color:#888;
+  margin-top:4px;
+}
+.container{
+  max-width:480px;
+  margin:0 auto;
+  padding:0 16px 16px;
+}
+/* Today's Entry Card */
+.today-card{
+  background:linear-gradient(135deg,rgba(108,92,231,0.15),rgba(253,121,168,0.1));
+  border:1px solid rgba(108,92,231,0.3);
+  border-radius:var(--radius);
+  padding:20px;
+  margin-bottom:16px;
+  animation:fadeIn 0.5s ease;
+}
+.today-card .label{
+  font-size:0.8rem;
+  color:var(--pink);
+  margin-bottom:8px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.today-card .entry-text{
+  font-size:1.1rem;
+  line-height:1.6;
+  margin-bottom:8px;
+  word-break:break-all;
+}
+.today-card .entry-mood{
+  font-size:1.8rem;
+}
+.today-card .no-entry{
+  color:#666;
+  font-size:0.95rem;
+  font-style:italic;
+}
+/* Input Area */
+.input-area{
+  background:var(--card-bg);
+  border-radius:var(--radius);
+  padding:20px;
+  margin-bottom:16px;
+  box-shadow:var(--shadow);
+  animation:fadeIn 0.5s ease 0.1s both;
+}
+.input-area h3{
+  font-size:1rem;
+  margin-bottom:12px;
+  color:var(--pink);
+}
+.text-input{
+  width:100%;
+  background:rgba(255,255,255,0.05);
+  border:2px solid rgba(255,255,255,0.1);
+  border-radius:12px;
+  padding:14px;
+  color:var(--text);
+  font-size:1rem;
+  outline:none;
+  transition:border-color 0.3s;
+  font-family:inherit;
+}
+.text-input:focus{
+  border-color:var(--accent);
+}
+.text-input::placeholder{
+  color:#555;
+}
+.char-count{
+  text-align:right;
+  font-size:0.75rem;
+  color:#555;
+  margin-top:4px;
+}
+.char-count.warn{
+  color:#e17055;
+}
+.mood-selector{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin:14px 0;
+}
+.mood-btn{
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  border:2px solid transparent;
+  background:rgba(255,255,255,0.05);
+  font-size:1.4rem;
+  cursor:pointer;
+  transition:all 0.2s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.mood-btn:hover{
+  background:rgba(255,255,255,0.1);
+  transform:scale(1.1);
+}
+.mood-btn.selected{
+  border-color:var(--accent);
+  background:rgba(108,92,231,0.2);
+  transform:scale(1.15);
+  box-shadow:0 0 12px rgba(108,92,231,0.4);
+}
+.save-btn{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:12px;
+  background:linear-gradient(135deg,var(--accent),var(--pink));
+  color:#fff;
+  font-size:1rem;
+  font-weight:600;
+  cursor:pointer;
+  transition:all 0.3s;
+  font-family:inherit;
+}
+.save-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 6px 20px rgba(108,92,231,0.4);
+}
+.save-btn:active{
+  transform:translateY(0);
+}
+.save-btn:disabled{
+  opacity:0.4;
+  cursor:not-allowed;
+  transform:none;
+}
+/* Streak */
+.streak-bar{
+  display:flex;
+  gap:12px;
+  margin-bottom:16px;
+  animation:fadeIn 0.5s ease 0.15s both;
+}
+.stat-card{
+  flex:1;
+  background:var(--card-bg);
+  border-radius:var(--radius);
+  padding:16px 12px;
+  text-align:center;
+  box-shadow:var(--shadow);
+}
+.stat-card .stat-icon{
+  font-size:1.6rem;
+  margin-bottom:4px;
+}
+.stat-card .stat-num{
+  font-size:1.5rem;
+  font-weight:700;
+  background:linear-gradient(135deg,var(--accent),var(--pink));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.stat-card .stat-label{
+  font-size:0.7rem;
+  color:#888;
+  margin-top:2px;
+}
+/* View Toggle */
+.view-toggle{
+  display:flex;
+  background:var(--card-bg);
+  border-radius:12px;
+  padding:4px;
+  margin-bottom:16px;
+  box-shadow:var(--shadow);
+}
+.view-btn{
+  flex:1;
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  background:transparent;
+  color:#888;
+  font-size:0.9rem;
+  cursor:pointer;
+  transition:all 0.3s;
+  font-family:inherit;
+}
+.view-btn.active{
+  background:linear-gradient(135deg,var(--accent),var(--pink));
+  color:#fff;
+  font-weight:600;
+}
+/* Calendar */
+.calendar-section{
+  background:var(--card-bg);
+  border-radius:var(--radius);
+  padding:16px;
+  margin-bottom:16px;
+  box-shadow:var(--shadow);
+  animation:fadeIn 0.4s ease;
+}
+.cal-nav{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:14px;
+}
+.cal-nav .month-label{
+  font-size:1.05rem;
+  font-weight:600;
+}
+.cal-nav button{
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  border:none;
+  background:rgba(255,255,255,0.08);
+  color:var(--text);
+  font-size:1.1rem;
+  cursor:pointer;
+  transition:background 0.2s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.cal-nav button:hover{
+  background:rgba(255,255,255,0.15);
+}
+.cal-weekdays{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  text-align:center;
+  margin-bottom:8px;
+}
+.cal-weekdays span{
+  font-size:0.75rem;
+  color:#666;
+  padding:4px 0;
+}
+.cal-grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:4px;
+}
+.cal-day{
+  aspect-ratio:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  border-radius:10px;
+  font-size:0.85rem;
+  cursor:pointer;
+  transition:all 0.2s;
+  position:relative;
+  background:transparent;
+  border:none;
+  color:var(--text);
+  font-family:inherit;
+}
+.cal-day:hover{
+  background:rgba(255,255,255,0.06);
+}
+.cal-day.empty{
+  cursor:default;
+}
+.cal-day.empty:hover{
+  background:transparent;
+}
+.cal-day.today{
+  background:rgba(108,92,231,0.2);
+  font-weight:700;
+  color:var(--accent);
+}
+.cal-day.has-entry::after{
+  content:"";
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:var(--pink);
+  position:absolute;
+  bottom:4px;
+}
+.cal-day.today.has-entry::after{
+  background:var(--accent);
+}
+.cal-day.other-month{
+  color:#333;
+}
+/* List View */
+.list-section{
+  animation:fadeIn 0.4s ease;
+}
+.list-item{
+  background:var(--card-bg);
+  border-radius:var(--radius);
+  padding:16px;
+  margin-bottom:10px;
+  box-shadow:var(--shadow);
+  display:flex;
+  gap:14px;
+  align-items:flex-start;
+  animation:slideIn 0.3s ease both;
+}
+.list-item .item-mood{
+  font-size:1.8rem;
+  flex-shrink:0;
+}
+.list-item .item-body{
+  flex:1;
+  min-width:0;
+}
+.list-item .item-date{
+  font-size:0.75rem;
+  color:#666;
+  margin-bottom:4px;
+}
+.list-item .item-text{
+  font-size:0.95rem;
+  line-height:1.5;
+  word-break:break-all;
+}
+.list-item .item-actions{
+  display:flex;
+  gap:8px;
+  flex-shrink:0;
+}
+.list-item .act-btn{
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  border:none;
+  background:rgba(255,255,255,0.06);
+  color:#888;
+  font-size:0.85rem;
+  cursor:pointer;
+  transition:all 0.2s;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.list-item .act-btn:hover{
+  background:rgba(255,255,255,0.12);
+  color:var(--text);
+}
+.list-item .act-btn.del:hover{
+  background:rgba(253,121,168,0.2);
+  color:var(--pink);
+}
+.empty-msg{
+  text-align:center;
+  padding:40px 20px;
+  color:#555;
+  font-size:0.9rem;
+}
+.empty-msg .empty-icon{
+  font-size:2.5rem;
+  margin-bottom:12px;
+  display:block;
+}
+/* Modal */
+.modal-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.6);
+  z-index:100;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  backdrop-filter:blur(4px);
+}
+.modal-overlay.show{
+  display:flex;
+}
+.modal{
+  background:var(--card-bg);
+  border-radius:var(--radius);
+  padding:24px;
+  width:100%;
+  max-width:360px;
+  box-shadow:0 10px 40px rgba(0,0,0,0.5);
+  animation:modalIn 0.3s ease;
+}
+.modal h3{
+  font-size:1.1rem;
+  margin-bottom:16px;
+  color:var(--pink);
+}
+.modal .text-input{
+  margin-bottom:12px;
+}
+.modal .mood-selector{
+  margin-bottom:16px;
+}
+.modal-actions{
+  display:flex;
+  gap:10px;
+}
+.modal-actions button{
+  flex:1;
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  font-size:0.95rem;
+  cursor:pointer;
+  font-family:inherit;
+  transition:all 0.2s;
+}
+.modal-actions .cancel-btn{
+  background:rgba(255,255,255,0.08);
+  color:var(--text);
+}
+.modal-actions .confirm-btn{
+  background:linear-gradient(135deg,var(--accent),var(--pink));
+  color:#fff;
+  font-weight:600;
+}
+.modal-actions button:hover{
+  transform:translateY(-1px);
+}
+/* Bottom Nav */
+.bottom-nav{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:rgba(26,26,46,0.95);
+  backdrop-filter:blur(10px);
+  display:flex;
+  justify-content:space-around;
+  padding:10px 0 env(safe-area-inset-bottom,12px);
+  border-top:1px solid rgba(255,255,255,0.06);
+  z-index:50;
+}
+.nav-item{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-decoration:none;
+  color:#666;
+  font-size:0.65rem;
+  transition:color 0.2s;
+  padding:4px 8px;
+}
+.nav-item.active{
+  color:var(--pink);
+}
+.nav-item .nav-icon{
+  font-size:1.3rem;
+  margin-bottom:2px;
+}
+/* Toast */
+.toast{
+  position:fixed;
+  top:20px;
+  left:50%;
+  transform:translateX(-50%) translateY(-100px);
+  background:var(--card-bg);
+  border:1px solid var(--accent);
+  border-radius:12px;
+  padding:12px 24px;
+  font-size:0.9rem;
+  z-index:200;
+  transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow:0 8px 30px rgba(0,0,0,0.4);
+}
+.toast.show{
+  transform:translateX(-50%) translateY(0);
+}
+/* Animations */
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(10px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes slideIn{
+  from{opacity:0;transform:translateX(-20px)}
+  to{opacity:1;transform:translateX(0)}
+}
+@keyframes modalIn{
+  from{opacity:0;transform:scale(0.9)}
+  to{opacity:1;transform:scale(1)}
+}
+/* Delete Confirm */
+.confirm-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.6);
+  z-index:110;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  backdrop-filter:blur(4px);
+}
+.confirm-overlay.show{
+  display:flex;
+}
+.confirm-box{
+  background:var(--card-bg);
+  border-radius:var(--radius);
+  padding:24px;
+  text-align:center;
+  max-width:300px;
+  width:100%;
+  animation:modalIn 0.3s ease;
+}
+.confirm-box p{
+  margin-bottom:20px;
+  font-size:1rem;
+  line-height:1.6;
+}
+.confirm-box .confirm-actions{
+  display:flex;
+  gap:10px;
+}
+.confirm-box .confirm-actions button{
+  flex:1;
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  font-size:0.95rem;
+  cursor:pointer;
+  font-family:inherit;
+}
+.confirm-box .no-btn{
+  background:rgba(255,255,255,0.08);
+  color:var(--text);
+}
+.confirm-box .yes-btn{
+  background:var(--pink);
+  color:#fff;
+  font-weight:600;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🍅 每日一句</h1>
+  <div class="date-display" id="headerDate"></div>
+</div>
+
+<div class="container">
+  <!-- Today's Entry -->
+  <div class="today-card" id="todayCard"></div>
+
+  <!-- Input Area -->
+  <div class="input-area" id="inputArea">
+    <h3>🍅 今天想说什么？</h3>
+    <input type="text" class="text-input" id="diaryInput" placeholder="记录今天的一句话..." maxlength="100" autocomplete="off">
+    <div class="char-count" id="charCount">0 / 100</div>
+    <div class="mood-selector" id="moodSelector"></div>
+    <button class="save-btn" id="saveBtn" disabled>🍅 记录今天</button>
+  </div>
+
+  <!-- Stats -->
+  <div class="streak-bar">
+    <div class="stat-card">
+      <div class="stat-icon">📝</div>
+      <div class="stat-num" id="statTotal">0</div>
+      <div class="stat-label">总记录</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🔥</div>
+      <div class="stat-num" id="statStreak">0</div>
+      <div class="stat-label">连续记录天数</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" id="statMoodIcon">😊</div>
+      <div class="stat-num" id="statMoodLabel" style="font-size:0.8rem;">-</div>
+      <div class="stat-label">最常心情</div>
+    </div>
+  </div>
+
+  <!-- View Toggle -->
+  <div class="view-toggle">
+    <button class="view-btn active" data-view="calendar">📅 日历</button>
+    <button class="view-btn" data-view="list">📋 列表</button>
+  </div>
+
+  <!-- Calendar View -->
+  <div class="calendar-section" id="calendarView">
+    <div class="cal-nav">
+      <button id="prevMonth">&lt;</button>
+      <span class="month-label" id="monthLabel"></span>
+      <button id="nextMonth">&gt;</button>
+    </div>
+    <div class="cal-weekdays">
+      <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+  </div>
+
+  <!-- List View -->
+  <div class="list-section" id="listView" style="display:none"></div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <h3>🍅 编辑记录</h3>
+    <input type="text" class="text-input" id="editInput" maxlength="100" autocomplete="off">
+    <div class="char-count" id="editCharCount">0 / 100</div>
+    <div class="mood-selector" id="editMoodSelector"></div>
+    <div class="modal-actions">
+      <button class="cancel-btn" id="editCancel">取消</button>
+      <button class="confirm-btn" id="editConfirm">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm -->
+<div class="confirm-overlay" id="deleteConfirm">
+  <div class="confirm-box">
+    <p>🍅 确定要删除这条记录吗？<br>删除后无法恢复哦~</p>
+    <div class="confirm-actions">
+      <button class="no-btn" id="deleteNo">算了</button>
+      <button class="yes-btn" id="deleteYes">删除</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Bottom Nav -->
+<nav class="bottom-nav">
+  <a href="hub.html" class="nav-item">
+    <span class="nav-icon">🏠</span>
+    <span>首页</span>
+  </a>
+  <a href="memories.html" class="nav-item">
+    <span class="nav-icon">📖</span>
+    <span>回忆</span>
+  </a>
+  <a href="anniversary.html" class="nav-item">
+    <span class="nav-icon">📅</span>
+    <span>纪念日</span>
+  </a>
+  <a href="quotes.html" class="nav-item">
+    <span class="nav-icon">💬</span>
+    <span>情话</span>
+  </a>
+  <a href="diary.html" class="nav-item active">
+    <span class="nav-icon">🍅</span>
+    <span>日记</span>
+  </a>
+  <a href="bucket.html" class="nav-item">
+    <span class="nav-icon">✅</span>
+    <span>清单</span>
+  </a>
+</nav>
+
+<script>
+(function(){
+  const MOODS = ["😊","😐","😢","😡","🥰","😴","🤔","🎉"];
+  const STORAGE_KEY = "our_diary";
+  const DEFAULT_ENTRIES = [
+    { date:"2026-05-31", text:"在一起的第一天 💕", mood:"🥰" },
+    { date:"2026-06-01", text:"今天一起吃了火锅", mood:"😊" }
+  ];
+
+  let entries = [];
+  let calYear, calMonth;
+  let selectedMood = "";
+  let editSelectedMood = "";
+  let editingDate = null;
+  let deletingDate = null;
+
+  // --- Storage ---
+  function loadEntries(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        entries = JSON.parse(raw);
+      } else {
+        entries = [...DEFAULT_ENTRIES];
+        saveEntries();
+      }
+    }catch(e){
+      entries = [...DEFAULT_ENTRIES];
+      saveEntries();
+    }
+  }
+  function saveEntries(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+  }
+  function getEntry(dateStr){
+    return entries.find(e => e.date === dateStr);
+  }
+  function getTodayStr(){
+    const d = new Date();
+    return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  }
+  function formatDate(dateStr){
+    const parts = dateStr.split("-");
+    return parts[0]+"年"+parseInt(parts[1])+"月"+parseInt(parts[2])+"日";
+  }
+  function getWeekday(dateStr){
+    const days = ["周日","周一","周二","周三","周四","周五","周六"];
+    return days[new Date(dateStr+"T00:00:00").getDay()];
+  }
+
+  // --- Header Date ---
+  function renderHeaderDate(){
+    const d = new Date();
+    const weekdays = ["周日","周一","周二","周三","周四","周五","周六"];
+    const str = d.getFullYear()+"年"+(d.getMonth()+1)+"月"+d.getDate()+"日 "+weekdays[d.getDay()];
+    document.getElementById("headerDate").textContent = str;
+  }
+
+  // --- Today Card ---
+  function renderTodayCard(){
+    const today = getTodayStr();
+    const entry = getEntry(today);
+    const card = document.getElementById("todayCard");
+    if(entry){
+      card.innerHTML = '<div class="label">🍅 今天的记录</div><div class="entry-text">'+escapeHtml(entry.text)+'</div><div class="entry-mood">'+entry.mood+'</div>';
+    } else {
+      card.innerHTML = '<div class="label">🍅 今天的记录</div><div class="no-entry">还没有记录今天的一句话哦~</div>';
+    }
+  }
+
+  // --- Input ---
+  function renderMoodButtons(containerId, selected, clickHandler){
+    const container = document.getElementById(containerId);
+    container.innerHTML = "";
+    MOODS.forEach(function(m){
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "mood-btn" + (m === selected ? " selected" : "");
+      btn.textContent = m;
+      btn.addEventListener("click", function(){ clickHandler(m); });
+      container.appendChild(btn);
+    });
+  }
+  function updateSaveBtn(){
+    const input = document.getElementById("diaryInput");
+    const btn = document.getElementById("saveBtn");
+    const today = getTodayStr();
+    const existing = getEntry(today);
+    btn.disabled = !(input.value.trim() && selectedMood);
+    if(existing){
+      btn.textContent = "🍅 更新今天";
+    } else {
+      btn.textContent = "🍅 记录今天";
+    }
+  }
+  function initInput(){
+    const input = document.getElementById("diaryInput");
+    const countEl = document.getElementById("charCount");
+    const today = getTodayStr();
+    const existing = getEntry(today);
+    if(existing){
+      input.value = existing.text;
+      selectedMood = existing.mood;
+      countEl.textContent = existing.text.length+" / 100";
+    }
+    renderMoodButtons("moodSelector", selectedMood, function(m){
+      selectedMood = m;
+      renderMoodButtons("moodSelector", selectedMood, arguments.callee);
+      updateSaveBtn();
+    });
+    input.addEventListener("input", function(){
+      const len = input.value.length;
+      countEl.textContent = len+" / 100";
+      countEl.className = "char-count" + (len > 90 ? " warn" : "");
+      updateSaveBtn();
+    });
+    document.getElementById("saveBtn").addEventListener("click", function(){
+      const text = input.value.trim();
+      if(!text || !selectedMood) return;
+      const todayStr = getTodayStr();
+      const idx = entries.findIndex(e => e.date === todayStr);
+      if(idx >= 0){
+        entries[idx].text = text;
+        entries[idx].mood = selectedMood;
+        showToast("🍅 已更新今天的记录！");
+      } else {
+        entries.push({ date:todayStr, text:text, mood:selectedMood });
+        showToast("🍅 记录成功！");
+      }
+      saveEntries();
+      renderAll();
+    });
+    updateSaveBtn();
+  }
+
+  // --- Stats ---
+  function calcStreak(){
+    if(entries.length === 0) return 0;
+    const sorted = entries.map(e=>e.date).sort().reverse();
+    const today = getTodayStr();
+    let streak = 0;
+    let checkDate = new Date(today+"T00:00:00");
+    // If today has no entry, start from yesterday
+    if(!sorted.includes(today)){
+      checkDate.setDate(checkDate.getDate()-1);
+    }
+    while(true){
+      const ds = checkDate.getFullYear()+"-"+String(checkDate.getMonth()+1).padStart(2,"0")+"-"+String(checkDate.getDate()).padStart(2,"0");
+      if(sorted.includes(ds)){
+        streak++;
+        checkDate.setDate(checkDate.getDate()-1);
+      } else {
+        break;
+      }
+    }
+    return streak;
+  }
+  function calcMostMood(){
+    if(entries.length === 0) return {mood:"😊",label:"暂无"};
+    const freq = {};
+    entries.forEach(function(e){
+      freq[e.mood] = (freq[e.mood]||0)+1;
+    });
+    let maxMood = "", maxCount = 0;
+    for(const m in freq){
+      if(freq[m] > maxCount){
+        maxCount = freq[m];
+        maxMood = m;
+      }
+    }
+    const moodNames = {"😊":"开心","😐":"平淡","😢":"难过","生气":"😡","🥰":"甜蜜","😴":"困困","🤔":"思考","🎉":"庆祝"};
+    const labelMap = {"😊":"开心","😐":"平淡","😢":"难过","😡":"生气","🥰":"甜蜜","😴":"困困","🤔":"思考","🎉":"庆祝"};
+    return { mood:maxMood, label:labelMap[maxMood]||maxMood };
+  }
+  function renderStats(){
+    document.getElementById("statTotal").textContent = entries.length;
+    document.getElementById("statStreak").textContent = calcStreak();
+    const mm = calcMostMood();
+    document.getElementById("statMoodIcon").textContent = mm.mood;
+    document.getElementById("statMoodLabel").textContent = mm.label;
+  }
+
+  // --- Calendar ---
+  function renderCalendar(){
+    const grid = document.getElementById("calGrid");
+    const label = document.getElementById("monthLabel");
+    label.textContent = calYear+"年"+(calMonth+1)+"月";
+    const firstDay = new Date(calYear, calMonth, 1).getDay();
+    const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+    const todayStr = getTodayStr();
+    // Entry dates set
+    const entryDates = new Set(entries.map(e=>e.date));
+    grid.innerHTML = "";
+    // Empty cells before first day
+    for(let i=0; i<firstDay; i++){
+      const cell = document.createElement("button");
+      cell.className = "cal-day empty";
+      cell.disabled = true;
+      grid.appendChild(cell);
+    }
+    for(let d=1; d<=daysInMonth; d++){
+      const dateStr = calYear+"-"+String(calMonth+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");
+      const cell = document.createElement("button");
+      cell.className = "cal-day";
+      if(dateStr === todayStr) cell.classList.add("today");
+      if(entryDates.has(dateStr)) cell.classList.add("has-entry");
+      cell.textContent = d;
+      cell.addEventListener("click", function(){
+        onCalDayClick(dateStr);
+      });
+      grid.appendChild(cell);
+    }
+  }
+  function onCalDayClick(dateStr){
+    const entry = getEntry(dateStr);
+    if(entry){
+      // Show in list view filtered or scroll to it
+      showListView();
+      // highlight the item
+      setTimeout(function(){
+        const items = document.querySelectorAll(".list-item");
+        items.forEach(function(el){
+          if(el.dataset.date === dateStr){
+            el.scrollIntoView({behavior:"smooth", block:"center"});
+            el.style.boxShadow = "0 0 0 2px var(--accent)";
+            setTimeout(function(){ el.style.boxShadow = ""; }, 2000);
+          }
+        });
+      }, 100);
+    } else {
+      // If it's today, focus input
+      if(dateStr === getTodayStr()){
+        document.getElementById("diaryInput").focus();
+        window.scrollTo({top:0, behavior:"smooth"});
+      } else {
+        showToast("🍅 "+formatDate(dateStr)+" 还没有记录哦~");
+      }
+    }
+  }
+
+  // --- List View ---
+  function renderListView(){
+    const container = document.getElementById("listView");
+    if(entries.length === 0){
+      container.innerHTML = '<div class="empty-msg"><span class="empty-icon">🍅</span>还没有任何记录~<br>快来写下今天的一句话吧！</div>';
+      return;
+    }
+    const sorted = entries.slice().sort(function(a,b){ return b.date.localeCompare(a.date); });
+    let html = "";
+    sorted.forEach(function(entry, i){
+      html += '<div class="list-item" data-date="'+entry.date+'" style="animation-delay:'+(i*0.05)+'s">'
+        + '<div class="item-mood">'+entry.mood+'</div>'
+        + '<div class="item-body">'
+        + '<div class="item-date">'+formatDate(entry.date)+' '+getWeekday(entry.date)+'</div>'
+        + '<div class="item-text">'+escapeHtml(entry.text)+'</div>'
+        + '</div>'
+        + '<div class="item-actions">'
+        + '<button class="act-btn edit" data-date="'+entry.date+'" title="编辑">✏️</button>'
+        + '<button class="act-btn del" data-date="'+entry.date+'" title="删除">🗑️</button>'
+        + '</div>'
+        + '</div>';
+    });
+    container.innerHTML = html;
+    // Bind edit/del
+    container.querySelectorAll(".edit").forEach(function(btn){
+      btn.addEventListener("click", function(){ openEditModal(btn.dataset.date); });
+    });
+    container.querySelectorAll(".del").forEach(function(btn){
+      btn.addEventListener("click", function(){ openDeleteConfirm(btn.dataset.date); });
+    });
+  }
+
+  // --- Edit Modal ---
+  function openEditModal(dateStr){
+    const entry = getEntry(dateStr);
+    if(!entry) return;
+    editingDate = dateStr;
+    editSelectedMood = entry.mood;
+    document.getElementById("editInput").value = entry.text;
+    document.getElementById("editCharCount").textContent = entry.text.length+" / 100";
+    renderMoodButtons("editMoodSelector", editSelectedMood, function(m){
+      editSelectedMood = m;
+      renderMoodButtons("editMoodSelector", editSelectedMood, arguments.callee);
+    });
+    document.getElementById("editModal").classList.add("show");
+    document.getElementById("editInput").focus();
+  }
+  function closeEditModal(){
+    document.getElementById("editModal").classList.remove("show");
+    editingDate = null;
+  }
+  function initEditModal(){
+    document.getElementById("editInput").addEventListener("input", function(){
+      document.getElementById("editCharCount").textContent = this.value.length+" / 100";
+    });
+    document.getElementById("editCancel").addEventListener("click", closeEditModal);
+    document.getElementById("editModal").addEventListener("click", function(e){
+      if(e.target === this) closeEditModal();
+    });
+    document.getElementById("editConfirm").addEventListener("click", function(){
+      if(!editingDate) return;
+      const text = document.getElementById("editInput").value.trim();
+      if(!text || !editSelectedMood) return;
+      const idx = entries.findIndex(e => e.date === editingDate);
+      if(idx >= 0){
+        entries[idx].text = text;
+        entries[idx].mood = editSelectedMood;
+        saveEntries();
+        showToast("🍅 已更新记录！");
+        renderAll();
+      }
+      closeEditModal();
+    });
+  }
+
+  // --- Delete Confirm ---
+  function openDeleteConfirm(dateStr){
+    deletingDate = dateStr;
+    document.getElementById("deleteConfirm").classList.add("show");
+  }
+  function closeDeleteConfirm(){
+    document.getElementById("deleteConfirm").classList.remove("show");
+    deletingDate = null;
+  }
+  function initDeleteConfirm(){
+    document.getElementById("deleteNo").addEventListener("click", closeDeleteConfirm);
+    document.getElementById("deleteConfirm").addEventListener("click", function(e){
+      if(e.target === this) closeDeleteConfirm();
+    });
+    document.getElementById("deleteYes").addEventListener("click", function(){
+      if(!deletingDate) return;
+      entries = entries.filter(e => e.date !== deletingDate);
+      saveEntries();
+      showToast("🍅 记录已删除");
+      renderAll();
+      closeDeleteConfirm();
+    });
+  }
+
+  // --- View Toggle ---
+  function initViews(){
+    document.querySelectorAll(".view-btn").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        document.querySelectorAll(".view-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        if(btn.dataset.view === "calendar"){
+          document.getElementById("calendarView").style.display = "";
+          document.getElementById("listView").style.display = "none";
+        } else {
+          document.getElementById("calendarView").style.display = "none";
+          document.getElementById("listView").style.display = "";
+          renderListView();
+        }
+      });
+    });
+  }
+  function showListView(){
+    document.querySelectorAll(".view-btn").forEach(b => b.classList.remove("active"));
+    document.querySelector('.view-btn[data-view="list"]').classList.add("active");
+    document.getElementById("calendarView").style.display = "none";
+    document.getElementById("listView").style.display = "";
+    renderListView();
+  }
+
+  // --- Month Nav ---
+  function initMonthNav(){
+    document.getElementById("prevMonth").addEventListener("click", function(){
+      calMonth--;
+      if(calMonth < 0){ calMonth = 11; calYear--; }
+      renderCalendar();
+    });
+    document.getElementById("nextMonth").addEventListener("click", function(){
+      calMonth++;
+      if(calMonth > 11){ calMonth = 0; calYear++; }
+      renderCalendar();
+    });
+  }
+
+  // --- Toast ---
+  function showToast(msg){
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(function(){ t.classList.remove("show"); }, 2500);
+  }
+
+  // --- Util ---
+  function escapeHtml(str){
+    const div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  // --- Render All ---
+  function renderAll(){
+    renderTodayCard();
+    initInput();
+    renderStats();
+    renderCalendar();
+    renderListView();
+  }
+
+  // --- Init ---
+  function init(){
+    const now = new Date();
+    calYear = now.getFullYear();
+    calMonth = now.getMonth();
+    loadEntries();
+    renderHeaderDate();
+    renderAll();
+    initViews();
+    initMonthNav();
+    initEditModal();
+    initDeleteConfirm();
+  }
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

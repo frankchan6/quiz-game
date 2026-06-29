@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>🍅 纪念日 & 倒计时</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f0f1a;
+  --card-bg:#1a1a2e;
+  --accent:#6c5ce7;
+  --pink:#fd79a8;
+  --text:#f5f5f5;
+  --radius:16px;
+  --card-shadow:0 4px 20px rgba(0,0,0,.3);
+}
+html{font-size:16px;-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  min-height:100vh;
+  padding:0 0 80px;
+  line-height:1.6;
+  overflow-x:hidden;
+}
+header{
+  text-align:center;
+  padding:32px 16px 12px;
+  position:relative;
+}
+header h1{
+  font-size:1.6rem;
+  background:linear-gradient(135deg,var(--pink),var(--accent));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+header p.sub{
+  font-size:.85rem;
+  color:rgba(245,245,245,.5);
+  margin-top:4px;
+}
+
+/* ---- live counter ---- */
+.live-counter-wrap{
+  margin:16px 16px 0;
+  padding:28px 20px 24px;
+  background:linear-gradient(135deg,rgba(108,92,231,.25),rgba(253,121,168,.18));
+  border:1px solid rgba(108,92,231,.35);
+  border-radius:var(--radius);
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+  animation:fadeInUp .6s ease-out;
+}
+.live-counter-wrap::before{
+  content:"🍅";
+  position:absolute;
+  top:-10px;right:-10px;
+  font-size:80px;
+  opacity:.08;
+  pointer-events:none;
+}
+.live-counter-wrap .label{
+  font-size:.95rem;
+  color:rgba(245,245,245,.7);
+  margin-bottom:12px;
+}
+.live-counter{
+  display:flex;
+  justify-content:center;
+  gap:6px;
+  flex-wrap:wrap;
+}
+.counter-segment{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  min-width:64px;
+}
+.counter-segment .num{
+  font-size:2.4rem;
+  font-weight:800;
+  background:linear-gradient(135deg,var(--pink),#a29bfe,var(--accent));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  line-height:1.1;
+}
+.counter-segment .unit{
+  font-size:.75rem;
+  color:rgba(245,245,245,.55);
+  margin-top:2px;
+}
+.counter-sep{
+  font-size:2rem;
+  font-weight:700;
+  color:rgba(245,245,245,.25);
+  align-self:flex-start;
+  margin-top:4px;
+}
+
+/* ---- section ---- */
+.section-title{
+  font-size:1.05rem;
+  font-weight:700;
+  margin:28px 20px 12px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.section-title .icon{font-size:1.1rem}
+
+/* ---- anniversary card ---- */
+.anniversary-list{
+  padding:0 16px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.ann-card{
+  background:var(--card-bg);
+  border-radius:var(--radius);
+  padding:16px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  box-shadow:var(--card-shadow);
+  position:relative;
+  animation:fadeInUp .5s ease-out both;
+  transition:transform .2s;
+}
+.ann-card:active{transform:scale(.98)}
+.ann-card .emoji{
+  font-size:2rem;
+  width:48px;height:48px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(108,92,231,.18);
+  border-radius:12px;
+  flex-shrink:0;
+}
+.ann-card .info{flex:1;min-width:0}
+.ann-card .info .name{
+  font-size:1rem;
+  font-weight:600;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.ann-card .info .date{
+  font-size:.78rem;
+  color:rgba(245,245,245,.45);
+  margin-top:2px;
+}
+.ann-card .days-badge{
+  flex-shrink:0;
+  text-align:right;
+}
+.ann-card .days-badge .days-num{
+  font-size:1.5rem;
+  font-weight:800;
+  background:linear-gradient(135deg,var(--pink),var(--accent));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.ann-card .days-badge .days-label{
+  font-size:.7rem;
+  color:rgba(245,245,245,.45);
+}
+.ann-card .del-btn{
+  position:absolute;
+  top:8px;right:10px;
+  background:none;border:none;
+  color:rgba(245,245,245,.2);
+  font-size:1rem;
+  cursor:pointer;
+  padding:4px;
+  transition:color .2s;
+}
+.ann-card .del-btn:hover,
+.ann-card .del-btn:active{color:var(--pink)}
+
+/* ---- monthly reminder ---- */
+.monthly-card{
+  margin:0 16px;
+  background:linear-gradient(135deg,rgba(253,121,168,.15),rgba(108,92,231,.12));
+  border:1px dashed rgba(253,121,168,.3);
+  border-radius:var(--radius);
+  padding:16px;
+  text-align:center;
+  animation:fadeInUp .6s ease-out .1s both;
+}
+.monthly-card .monthly-emoji{font-size:1.8rem}
+.monthly-card .monthly-text{
+  font-size:.9rem;
+  margin-top:6px;
+  color:rgba(245,245,245,.7);
+}
+.monthly-card .monthly-days{
+  font-size:1.6rem;
+  font-weight:800;
+  background:linear-gradient(135deg,var(--pink),var(--accent));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  margin-top:4px;
+}
+
+/* ---- lunar hint ---- */
+.lunar-hint{
+  margin:12px 16px 0;
+  padding:12px 14px;
+  background:rgba(108,92,231,.1);
+  border:1px solid rgba(108,92,231,.2);
+  border-radius:12px;
+  font-size:.78rem;
+  color:rgba(245,245,245,.5);
+  line-height:1.5;
+}
+
+/* ---- FAB ---- */
+.fab{
+  position:fixed;
+  bottom:96px;
+  right:20px;
+  width:56px;height:56px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--accent),var(--pink));
+  border:none;
+  color:#fff;
+  font-size:1.8rem;
+  cursor:pointer;
+  box-shadow:0 4px 20px rgba(108,92,231,.45);
+  z-index:100;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .2s;
+  animation:fabPop .4s ease-out .3s both;
+}
+.fab:active{transform:scale(.9)}
+
+/* ---- bottom sheet overlay ---- */
+.overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.55);
+  z-index:200;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .3s;
+}
+.overlay.active{opacity:1;pointer-events:auto}
+.sheet{
+  position:fixed;
+  left:0;right:0;bottom:0;
+  background:var(--card-bg);
+  border-radius:20px 20px 0 0;
+  padding:24px 20px 40px;
+  z-index:210;
+  transform:translateY(100%);
+  transition:transform .35s cubic-bezier(.32,.72,0,1);
+  max-height:85vh;
+  overflow-y:auto;
+}
+.overlay.active + .sheet,
+.sheet.active{transform:translateY(0)}
+.sheet .handle{
+  width:40px;height:4px;
+  background:rgba(245,245,245,.2);
+  border-radius:2px;
+  margin:0 auto 20px;
+}
+.sheet h2{
+  font-size:1.15rem;
+  margin-bottom:18px;
+  text-align:center;
+  background:linear-gradient(135deg,var(--pink),var(--accent));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.field{margin-bottom:14px}
+.field label{
+  display:block;
+  font-size:.82rem;
+  color:rgba(245,245,245,.55);
+  margin-bottom:6px;
+}
+.field input,.field select{
+  width:100%;
+  padding:12px 14px;
+  background:rgba(245,245,245,.06);
+  border:1px solid rgba(245,245,245,.1);
+  border-radius:12px;
+  color:var(--text);
+  font-size:1rem;
+  outline:none;
+  transition:border-color .2s;
+  -webkit-appearance:none;
+}
+.field input:focus{border-color:var(--accent)}
+.emoji-grid{
+  display:grid;
+  grid-template-columns:repeat(8,1fr);
+  gap:8px;
+}
+.emoji-opt{
+  width:100%;aspect-ratio:1;
+  border-radius:10px;
+  background:rgba(245,245,245,.05);
+  border:2px solid transparent;
+  font-size:1.4rem;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;
+}
+.emoji-opt.selected{
+  border-color:var(--accent);
+  background:rgba(108,92,231,.2);
+}
+.sheet .btn-primary{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:12px;
+  background:linear-gradient(135deg,var(--accent),var(--pink));
+  color:#fff;
+  font-size:1rem;
+  font-weight:600;
+  cursor:pointer;
+  margin-top:8px;
+  transition:transform .15s;
+}
+.sheet .btn-primary:active{transform:scale(.97)}
+
+/* ---- bottom nav ---- */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;
+  background:rgba(26,26,46,.92);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border-top:1px solid rgba(245,245,245,.06);
+  display:flex;
+  z-index:50;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.bottom-nav a{
+  flex:1;
+  display:flex;flex-direction:column;align-items:center;
+  padding:8px 0 6px;
+  text-decoration:none;
+  color:rgba(245,245,245,.4);
+  font-size:.65rem;
+  transition:color .2s;
+}
+.bottom-nav a.active{color:var(--pink)}
+.bottom-nav a .nav-icon{font-size:1.3rem;margin-bottom:2px}
+
+/* ---- animations ---- */
+@keyframes fadeInUp{
+  from{opacity:0;transform:translateY(18px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes fabPop{
+  from{opacity:0;transform:scale(.5)}
+  to{opacity:1;transform:scale(1)}
+}
+
+/* ---- empty state ---- */
+.empty-state{
+  text-align:center;
+  padding:40px 20px;
+  color:rgba(245,245,245,.35);
+  font-size:.9rem;
+}
+.empty-state .empty-emoji{font-size:2.5rem;margin-bottom:8px}
+
+/* scroll */
+::-webkit-scrollbar{display:none}
+body{-ms-overflow-style:none;scrollbar-width:none}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🍅 纪念日 & 倒计时</h1>
+  <p class="sub">记录我们每一个重要的日子</p>
+</header>
+
+<!-- Live counter -->
+<div class="live-counter-wrap">
+  <div class="label">💕 在一起的日子</div>
+  <div class="live-counter" id="liveCounter">
+    <div class="counter-segment"><span class="num" id="cDays">0</span><span class="unit">天</span></div>
+    <span class="counter-sep">:</span>
+    <div class="counter-segment"><span class="num" id="cHours">0</span><span class="unit">小时</span></div>
+    <span class="counter-sep">:</span>
+    <div class="counter-segment"><span class="num" id="cMins">0</span><span class="unit">分钟</span></div>
+    <span class="counter-sep">:</span>
+    <div class="counter-segment"><span class="num" id="cSecs">0</span><span class="unit">秒</span></div>
+  </div>
+</div>
+
+<!-- Monthly anniversary reminder -->
+<div class="section-title"><span class="icon">📅</span> 每月纪念日</div>
+<div class="monthly-card" id="monthlyCard">
+  <div class="monthly-emoji">🌹</div>
+  <div class="monthly-text">距离下个月纪念日还有</div>
+  <div class="monthly-days" id="monthlyDays">--</div>
+</div>
+
+<!-- Upcoming anniversaries -->
+<div class="section-title"><span class="icon">⏰</span> 即将到来的纪念日</div>
+<div class="anniversary-list" id="upcomingList"></div>
+
+<!-- Past anniversaries -->
+<div class="section-title"><span class="icon">📖</span> 已过的纪念日</div>
+<div class="anniversary-list" id="pastList"></div>
+
+<!-- Lunar calendar hint -->
+<div class="lunar-hint">
+  💡 农历生日提示：添加纪念日时，如需记录农历生日，可在名称中标注"农历"，例如"妈妈农历生日"。系统会按照公历日期计算天数，建议每年更新一次对应的公历日期。
+</div>
+
+<!-- FAB -->
+<button class="fab" id="fabBtn" aria-label="添加纪念日">+</button>
+
+<!-- Overlay + Bottom Sheet -->
+<div class="overlay" id="overlay"></div>
+<div class="sheet" id="sheet">
+  <div class="handle"></div>
+  <h2>🍅 添加纪念日</h2>
+  <div class="field">
+    <label>名称</label>
+    <input type="text" id="inputName" placeholder="例如：第一次约会、生日" maxlength="30">
+  </div>
+  <div class="field">
+    <label>日期</label>
+    <input type="date" id="inputDate">
+  </div>
+  <div class="field">
+    <label>选择表情</label>
+    <div class="emoji-grid" id="emojiGrid"></div>
+  </div>
+  <button class="btn-primary" id="saveBtn">保存纪念日 🍅</button>
+</div>
+
+<!-- Bottom Nav -->
+<nav class="bottom-nav">
+  <a href="hub.html"><span class="nav-icon">🏠</span>首页</a>
+  <a href="memories.html"><span class="nav-icon">📖</span>回忆</a>
+  <a href="quotes.html"><span class="nav-icon">💬</span>语录</a>
+  <a href="bucket.html"><span class="nav-icon">✅</span>清单</a>
+  <a href="diary.html"><span class="nav-icon">📝</span>日记</a>
+</nav>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---- constants ---- */
+  const STORAGE_KEY = "our_anniversaries";
+  const TOGETHER_DATE = "2026-05-31";
+  const EMOJI_LIST = ["💕","❤️","🎂","🎉","🌹","💍","🏖️","✈️","🎄","🎃","🧧","🎓","🏠","🐱","🐶","🍀","⭐","🍰","☕","🎶","🌈","🦋","🌻","🍕"];
+
+  /* ---- helpers ---- */
+  const $ = s => document.querySelector(s);
+  const $$ = s => document.querySelectorAll(s);
+  const pad = n => String(n).padStart(2,"0");
+
+  function daysBetween(a, b){
+    const msDay = 86400000;
+    const ua = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+    const ub = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+    return Math.floor((ub - ua) / msDay);
+  }
+
+  function parseDate(str){
+    const [y,m,d] = str.split("-").map(Number);
+    return new Date(y, m-1, d);
+  }
+
+  function formatDate(d){
+    return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+  }
+
+  function lunarHint(name){
+    return name.includes("农历");
+  }
+
+  /* ---- storage ---- */
+  function load(){
+    try{
+      return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    }catch(e){ return []; }
+  }
+  function save(data){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+  function ensureDefaults(){
+    let data = load();
+    if(!data.find(i => i.date === TOGETHER_DATE && i.name === "在一起纪念日")){
+      data.unshift({ date: TOGETHER_DATE, name:"在一起纪念日", emoji:"💕" });
+      save(data);
+    }
+  }
+
+  /* ---- live counter ---- */
+  function tickLiveCounter(){
+    const start = parseDate(TOGETHER_DATE);
+    const now = new Date();
+    let diff = Math.max(0, now - start);
+    const secs = Math.floor(diff / 1000);
+    const d = Math.floor(secs / 86400);
+    const h = Math.floor((secs % 86400) / 3600);
+    const m = Math.floor((secs % 3600) / 60);
+    const s = secs % 60;
+    $("#cDays").textContent = d;
+    $("#cHours").textContent = pad(h);
+    $("#cMins").textContent = pad(m);
+    $("#cSecs").textContent = pad(s);
+  }
+
+  /* ---- monthly anniversary ---- */
+  function updateMonthly(){
+    const start = parseDate(TOGETHER_DATE);
+    const now = new Date();
+    const todayDate = now.getDate();
+    const startDate = start.getDate();
+
+    let nextMonthly;
+    if(todayDate < startDate){
+      nextMonthly = new Date(now.getFullYear(), now.getMonth(), startDate);
+    } else if(todayDate === startDate){
+      // It's today!
+      $("#monthlyDays").textContent = "就是今天！🎉";
+      return;
+    } else {
+      nextMonthly = new Date(now.getFullYear(), now.getMonth()+1, startDate);
+    }
+    const daysLeft = daysBetween(now, nextMonthly);
+    $("#monthlyDays").textContent = daysLeft + " 天";
+  }
+
+  /* ---- render anniversary lists ---- */
+  function render(){
+    const data = load();
+    const now = new Date();
+    now.setHours(0,0,0,0);
+
+    const upcoming = [];
+    const past = [];
+
+    data.forEach((item, idx) => {
+      const d = parseDate(item.date);
+      const diff = daysBetween(now, d);
+      const entry = { ...item, idx, diff };
+      if(diff > 0) upcoming.push(entry);
+      else past.push(entry);
+    });
+
+    upcoming.sort((a,b) => a.diff - b.diff);
+    past.sort((a,b) => b.diff - a.diff);
+
+    // Upcoming
+    if(upcoming.length === 0){
+      $("#upcomingList").innerHTML = '<div class="empty-state"><div class="empty-emoji">🍅</div>暂无即将到来的纪念日</div>';
+    } else {
+      $("#upcomingList").innerHTML = upcoming.map(renderCardFuture).join("");
+    }
+
+    // Past
+    if(past.length === 0){
+      $("#pastList").innerHTML = '<div class="empty-state"><div class="empty-emoji">📝</div>还没有已过的纪念日</div>';
+    } else {
+      $("#pastList").innerHTML = past.map(renderCardPast).join("");
+    }
+
+    // bind delete
+    $$(".del-btn").forEach(btn => {
+      btn.addEventListener("click", function(e){
+        e.stopPropagation();
+        const idx = parseInt(this.dataset.idx);
+        if(confirm("确定要删除这个纪念日吗？")){
+          const data = load();
+          data.splice(idx, 1);
+          save(data);
+          render();
+        }
+      });
+    });
+  }
+
+  function renderCardFuture(item){
+    return `<div class="ann-card" style="animation-delay:${item.idx*0.05}s">
+      <div class="emoji">${item.emoji}</div>
+      <div class="info">
+        <div class="name">${esc(item.name)}${lunarHint(item.name)?' 🌙':''}</div>
+        <div class="date">${item.date}</div>
+      </div>
+      <div class="days-badge">
+        <div class="days-num">${item.diff}</div>
+        <div class="days-label">天后</div>
+      </div>
+      <button class="del-btn" data-idx="${item.idx}" aria-label="删除">✕</button>
+    </div>`;
+  }
+
+  function renderCardPast(item){
+    return `<div class="ann-card" style="animation-delay:${item.idx*0.05}s">
+      <div class="emoji">${item.emoji}</div>
+      <div class="info">
+        <div class="name">${esc(item.name)}${lunarHint(item.name)?' 🌙':''}</div>
+        <div class="date">${item.date}</div>
+      </div>
+      <div class="days-badge">
+        <div class="days-num">${Math.abs(item.diff)}</div>
+        <div class="days-label">天前</div>
+      </div>
+      <button class="del-btn" data-idx="${item.idx}" aria-label="删除">✕</button>
+    </div>`;
+  }
+
+  function esc(s){
+    const el = document.createElement("span");
+    el.textContent = s;
+    return el.innerHTML;
+  }
+
+  /* ---- emoji picker ---- */
+  let selectedEmoji = EMOJI_LIST[0];
+  function buildEmojiGrid(){
+    const grid = $("#emojiGrid");
+    grid.innerHTML = EMOJI_LIST.map(e =>
+      `<button type="button" class="emoji-opt${e===selectedEmoji?" selected":""}" data-emoji="${e}">${e}</button>`
+    ).join("");
+    grid.addEventListener("click", function(e){
+      const btn = e.target.closest(".emoji-opt");
+      if(!btn) return;
+      $$(".emoji-opt").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+      selectedEmoji = btn.dataset.emoji;
+    });
+  }
+
+  /* ---- sheet open/close ---- */
+  function openSheet(){
+    $("#overlay").classList.add("active");
+    $("#sheet").classList.add("active");
+    // set default date to today
+    if(!$("#inputDate").value){
+      $("#inputDate").value = formatDate(new Date());
+    }
+  }
+  function closeSheet(){
+    $("#overlay").classList.remove("active");
+    $("#sheet").classList.remove("active");
+  }
+
+  /* ---- save new anniversary ---- */
+  function saveAnniversary(){
+    const name = $("#inputName").value.trim();
+    const date = $("#inputDate").value;
+    if(!name){ alert("请输入名称"); return; }
+    if(!date){ alert("请选择日期"); return; }
+
+    const data = load();
+    data.push({ date, name, emoji: selectedEmoji });
+    save(data);
+
+    // reset form
+    $("#inputName").value = "";
+    selectedEmoji = EMOJI_LIST[0];
+    buildEmojiGrid();
+    closeSheet();
+    render();
+  }
+
+  /* ---- init ---- */
+  function init(){
+    ensureDefaults();
+    buildEmojiGrid();
+    tickLiveCounter();
+    setInterval(tickLiveCounter, 1000);
+    updateMonthly();
+    setInterval(updateMonthly, 60000);
+    render();
+
+    $("#fabBtn").addEventListener("click", openSheet);
+    $("#overlay").addEventListener("click", closeSheet);
+    $("#saveBtn").addEventListener("click", saveAnniversary);
+
+    // swipe down to close
+    let startY = 0;
+    const sheet = $("#sheet");
+    sheet.addEventListener("touchstart", e => { startY = e.touches[0].clientY; }, {passive:true});
+    sheet.addEventListener("touchmove", e => {
+      const dy = e.touches[0].clientY - startY;
+      if(dy > 80) closeSheet();
+    }, {passive:true});
+  }
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>
